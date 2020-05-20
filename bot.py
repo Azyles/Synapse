@@ -8,13 +8,22 @@ import discord
 from discord.ext import commands
 
 
+
+#StockPrice Imports
+import yfinance as yfimport
+
 description = '''The ultimate bot'''
 
 bot = commands.Bot('X ', description=description)
 
+
+activeactivity = ['Watching Stock Prices Fall', 'Analyzing Market...', 'Calculating Stock Prices']
+
+
+
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name='With Machine Learning Algorithms'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=random.choice(activeactivity)))
     print(bot.user.name)
     print('status set to online')
     print(bot.user.id)
@@ -45,4 +54,4 @@ async def about(ctx):
 
     await ctx.send(embed=embed)
 
-bot.run()
+bot.run('NzEyNTE1NTMyNjgyOTUyNzM1.XsS7iw.GVkHam2IUZXkaSWugb_X5l_-OkI')
