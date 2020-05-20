@@ -3,23 +3,26 @@ import asyncio
 import base64
 import random
 import time
-
+import os
 import discord
 from discord.ext import commands
 
 
 
 #StockPrice Imports
-import yfinance as yfimport
+import pandas as pd
+import pandas_datareader.data as web
+import datetime as dt
+import matplotlib.pyplot as plt
+from matplotlib import style
 
 description = '''The ultimate bot'''
 
 bot = commands.Bot('X ', description=description)
 
-
 activeactivity = ['Watching Stock Prices Fall', 'Analyzing Market...', 'Calculating Stock Prices']
 
-
+graphcolor = ['Red','Blue','Green','Orange','Pink']
 
 @bot.event
 async def on_ready():
@@ -43,6 +46,21 @@ async def a(ctx, * message):
     await channel.send(text)
 
 @bot.command()
+async def stock(ctx, * stocksymbol):
+    df = web.DataReader(stocksymbol, 'yahoo')
+    df['Adj Close'].plot(color=random.choice(graphcolor), linewidth=1)
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
+    df.reset_index(inplace=True)
+    df.set_index("Date", inplace=True)
+    await ctx.send(file=file)
+    os.remove("Stock.png")
+
+@bot.command()
+async def stockp(ctx, * stocksymbol):
+    df = web.DataReader(stocksymbol, 'yahoo')
+
+@bot.command()
 async def logo(ctx):
     await ctx.send('https://i.imgur.com/Q66BhxI.png')
 
@@ -53,5 +71,3 @@ async def about(ctx):
         title="Synapse", description='Hello Im synapse', color=0xBB0000)
 
     await ctx.send(embed=embed)
-
-bot.run('NzEyNTE1NTMyNjgyOTUyNzM1.XsS7iw.GVkHam2IUZXkaSWugb_X5l_-OkI')
