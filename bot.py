@@ -1,4 +1,3 @@
-
 import asyncio
 import base64
 import random
@@ -6,8 +5,6 @@ import time
 import os
 import discord
 from discord.ext import commands
-
-
 
 #StockPrice Imports
 import pandas as pd
@@ -22,41 +19,55 @@ import quandl
 import pyfolio as pf
 from yahoo_fin import stock_info as si
 import stocker
-
+import requests
+import json
+#Weather
+city_name = 'Monterey'
+api_key = "549b0eaf0ba1e27619cf96fb0ba32a1b"
+base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
 description = '''The ultimate bot'''
 
 bot = commands.Bot('X ', description=description)
 
-activeactivity = ['Watching Stock Prices Fall', 'Analyzing Market...', 'Calculating Stock Prices']
+activeactivity = [
+    'Watching Stock Prices Fall', 'Analyzing Market...',
+    'Calculating Stock Prices'
+]
 
-graphcolor = ['Red','Blue','Green','Orange','Pink']
+graphcolor = ['Red', 'Blue', 'Green', 'Orange', 'Pink']
+
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=random.choice(activeactivity)))
+    await bot.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.playing,
+            name=random.choice(activeactivity)))
     print(bot.user.name)
     print('status set to online')
     print(bot.user.id)
-    print('------')
+    print('--------------------')
 
 
 @bot.command()
 async def ping(ctx):
-    ping = round(bot.latency*1000)
+    ping = round(bot.latency * 1000)
     await ctx.send(f"The ping of this bot is {ping} ms")
 
 
 @bot.command()
-async def a(ctx, * message):
+async def a(ctx, *message):
     channel = bot.get_channel(699328249154633768)
     text = ' '.join(message)
     await channel.send(text)
 
+
 @bot.command()
-async def Graph(ctx, * stocksymbol):
+async def Graph(ctx, *stocksymbol):
     df = web.DataReader(stocksymbol, 'yahoo')
-    df['Adj Close'].plot(color=random.choice(graphcolor), linewidth=1,figsize=(10, 7))
+    df['Adj Close'].plot(
+        color=random.choice(graphcolor), linewidth=1, figsize=(10, 7))
     plt.title("Adjusted Close Price of %s" % stocksymbol, fontsize=16)
     plt.ylabel('Price', fontsize=14)
     plt.xlabel('Year', fontsize=14)
@@ -68,11 +79,13 @@ async def Graph(ctx, * stocksymbol):
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
 
+
 @bot.command()
-async def CGraph(ctx,range:int ,* stocksymbol):
+async def CGraph(ctx, range: int, *stocksymbol):
     week = datetime.now() - timedelta(days=range)
-    df = web.DataReader(stocksymbol, 'yahoo',week,dt.datetime.now())
-    df['Adj Close'].plot(color=random.choice(graphcolor), linewidth=1,figsize=(10, 7))
+    df = web.DataReader(stocksymbol, 'yahoo', week, dt.datetime.now())
+    df['Adj Close'].plot(
+        color=random.choice(graphcolor), linewidth=1, figsize=(10, 7))
     plt.title("Adjusted Close Price of %s" % stocksymbol, fontsize=16)
     plt.ylabel('Price', fontsize=14)
     plt.xlabel('Days', fontsize=14)
@@ -90,20 +103,30 @@ async def Analysis(ctx, stocksymbol: str):
     stock = si.get_live_price(stocksymbol)
     livevalue = format(round(stock, 2))
     embed = discord.Embed(
-        title=stocksymbol, description="Current Value: " + livevalue, color=0x00FFCD)
+        title=stocksymbol,
+        description="Current Value: " + livevalue,
+        color=0x00FFCD)
     await asyncio.sleep(1)
     await ctx.send(embed=embed)
+
 
 @bot.command()
 async def Stonks(ctx):
     stock = si.get_live_price('DJI')
     if stock < 24000:
-        await ctx.send('https://i.kym-cdn.com/photos/images/newsfeed/001/499/826/2f0.png')
+        await ctx.send(
+            'https://i.kym-cdn.com/photos/images/newsfeed/001/499/826/2f0.png')
     else:
-        await ctx.send('https://vmsseaglescall.org/wp-content/uploads/2019/10/Screen-Shot-2019-10-25-at-11.23.07-AM-475x260.png')
+        await ctx.send(
+            'https://vmsseaglescall.org/wp-content/uploads/2019/10/Screen-Shot-2019-10-25-at-11.23.07-AM-475x260.png'
+        )
+
 
 @bot.command()
-async def RiskReturn(ctx, stocksymbol:str,):
+async def RiskReturn(
+        ctx,
+        stocksymbol: str,
+):
     dfcomp = web.DataReader(stocksymbol, 'yahoo')
     retscomp = dfcomp.pct_change()
     plt.scatter(retscomp.mean(), retscomp.std())
@@ -111,34 +134,47 @@ async def RiskReturn(ctx, stocksymbol:str,):
     plt.ylabel('Risk')
     for label, x, y in zip(retscomp.columns, retscomp.mean(), retscomp.std()):
         plt.annotate(
-            label, 
-            xy = (x, y), xytext = (20, -20),
-            textcoords = 'offset points', ha = 'right', va = 'bottom',
-            bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5),
-            arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+            label,
+            xy=(x, y),
+            xytext=(20, -20),
+            textcoords='offset points',
+            ha='right',
+            va='bottom',
+            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+            arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
     plt.savefig("Images/Stock.png")
     file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
 
+
 @bot.command()
-async def XRiskReturn(ctx, stocksymbol:str,stocksymbol2:str,stocksymbol3:str,):
-    dfcomp = web.DataReader([stocksymbol,stocksymbol2,stocksymbol3], 'yahoo')
+async def XRiskReturn(
+        ctx,
+        stocksymbol: str,
+        stocksymbol2: str,
+        stocksymbol3: str,
+):
+    dfcomp = web.DataReader([stocksymbol, stocksymbol2, stocksymbol3], 'yahoo')
     retscomp = dfcomp.pct_change()
     plt.scatter(retscomp.mean(), retscomp.std())
     plt.xlabel('Expected returns')
     plt.ylabel('Risk')
     for label, x, y in zip(retscomp.columns, retscomp.mean(), retscomp.std()):
         plt.annotate(
-            label, 
-            xy = (x, y), xytext = (20, -20),
-            textcoords = 'offset points', ha = 'right', va = 'bottom',
-            bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5),
-            arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+            label,
+            xy=(x, y),
+            xytext=(20, -20),
+            textcoords='offset points',
+            ha='right',
+            va='bottom',
+            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+            arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
     plt.savefig("Images/Stock.png")
     file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
+
 
 @bot.command()
 async def Return(ctx, stocksymbol: str):
@@ -146,7 +182,7 @@ async def Return(ctx, stocksymbol: str):
     df_daily_returns = df['Adj Close'].pct_change()
     df_monthly_returns = df['Adj Close'].resample('M').ffill().pct_change()
     fig = plt.figure()
-    ax1 = fig.add_axes([0.1,0.1,0.8,0.8])
+    ax1 = fig.add_axes([0.1, 0.1, 0.8, 0.8])
     ax1.plot(df_daily_returns)
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Percent")
@@ -157,7 +193,7 @@ async def Return(ctx, stocksymbol: str):
     os.remove("Images/Stock.png")
     #monthly
     fig = plt.figure()
-    ax1 = fig.add_axes([0.1,0.1,0.8,0.8])
+    ax1 = fig.add_axes([0.1, 0.1, 0.8, 0.8])
     ax1.plot(df_monthly_returns)
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Percent")
@@ -168,45 +204,88 @@ async def Return(ctx, stocksymbol: str):
     os.remove("Images/Stock.png")
     #HISTOGRAM
     fig = plt.figure()
-    ax1 = fig.add_axes([0.1,0.1,0.8,0.8])
-    df_daily_returns.plot.hist(bins = 60)
+    ax1 = fig.add_axes([0.1, 0.1, 0.8, 0.8])
+    df_daily_returns.plot.hist(bins=60)
     ax1.set_xlabel("Daily returns %")
     ax1.set_ylabel("Percent")
     ax1.set_title("daily returns data")
-    ax1.text(-0.35,200,"Extreme Low\nreturns")
-    ax1.text(0.25,200,"Extreme High\nreturns")
+    ax1.text(-0.35, 200, "Extreme Low\nreturns")
+    ax1.text(0.25, 200, "Extreme High\nreturns")
     plt.savefig("Images/Stock.png")
     file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
 
+
 @bot.command()
 async def Stock(ctx, stocksymbol: str):
     stock = si.get_live_price(stocksymbol)
     await ctx.send(format(round(stock, 2)))
-    
+
 
 @bot.command()
-async def Predict(ctx, stocksymbol:str):
+async def Predict(ctx, stocksymbol: str):
     await ctx.send(stocker.predict.tomorrow(stocksymbol))
 
 
 @bot.command()
-async def Data(ctx, stocksymbol,days = 0): 
+async def Data(ctx, stocksymbol, days=0):
     if days == 0:
         yesterday = datetime.now() - timedelta(days=7)
-        df = web.DataReader(stocksymbol, 'yahoo',yesterday,dt.datetime.now())
+        df = web.DataReader(stocksymbol, 'yahoo', yesterday, dt.datetime.now())
         style.use('ggplot')
         df.reset_index(inplace=True)
         df.set_index("Date", inplace=True)
         await ctx.send(df.head())
     else:
         yesterday = datetime.now() - timedelta(days=days)
-        df = web.DataReader(stocksymbol, 'yahoo',yesterday,dt.datetime.now())
+        df = web.DataReader(stocksymbol, 'yahoo', yesterday, dt.datetime.now())
         style.use('ggplot')
         df.reset_index(inplace=True)
         df.set_index("Date", inplace=True)
         await ctx.send(df.head())
+
+
+@bot.command()
+async def Weather(ctx, City: str):
+    complete_url = base_url + "appid=" + api_key + "&q=" + City
+    response = requests.get(complete_url)
+    x = response.json()
+    if x["cod"] != "404":
+        y = x["main"]
+        current_temperature = y["temp"]
+        current_pressure = y["pressure"]
+        current_humidiy = y["humidity"]
+        z = x["weather"]
+        weather_description = z[0]["description"]
+        embed = discord.Embed(
+            title="Synapse",
+            url="https://github.com/KingRegera/Synapse",
+            description="Synapse Weather gets information with the help of openweathermap.org",
+            color=0x75ffee)
+        embed.set_author(
+            name="Kushagra Singh", url="https://github.com/KingRegera/Synapse")
+        embed.set_thumbnail(url="https://i.imgur.com/Q66BhxI.png")
+        embed.add_field(
+            name="Temperature",
+            value=str(format(round(current_temperature - 273.15, 2))) + "°C",
+            inline=False)
+        embed.add_field(
+            name="atmospheric pressure",
+            value=str(current_pressure) + " hPa",
+            inline=False)
+        embed.add_field(
+            name="humidity", value=str(current_humidiy) + "%", inline=False)
+        embed.add_field(
+            name="Synapse+ Description",
+            value=str(weather_description),
+            inline=False)
+        await ctx.send(embed=embed)
+    else:
+        embed = discord.Embed(
+            title="Error", description="City Not Found", color=0xFF8080)
+        await ctx.send(embed=embed)
+
 
 @bot.command()
 async def Logo(ctx):
@@ -216,6 +295,8 @@ async def Logo(ctx):
 @bot.command()
 async def About(ctx):
     embed = discord.Embed(
-        title="Synapse", description='Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ', color=0xBB0000)
+        title="Synapse",
+        description='Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ',
+        color=0xBB0000)
 
     await ctx.send(embed=embed)
