@@ -140,6 +140,45 @@ async def XRiskReturn(ctx, stocksymbol:str,stocksymbol2:str,stocksymbol3:str,):
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
 
+@bot.command()
+async def Return(ctx, stocksymbol: str):
+    df = web.DataReader(stocksymbol, 'yahoo')
+    df_daily_returns = df['Adj Close'].pct_change()
+    df_monthly_returns = df['Adj Close'].resample('M').ffill().pct_change()
+    fig = plt.figure()
+    ax1 = fig.add_axes([0.1,0.1,0.8,0.8])
+    ax1.plot(df_daily_returns)
+    ax1.set_xlabel("Date")
+    ax1.set_ylabel("Percent")
+    ax1.set_title("daily returns data")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    await ctx.send(file=file)
+    os.remove("Images/Stock.png")
+    #monthly
+    fig = plt.figure()
+    ax1 = fig.add_axes([0.1,0.1,0.8,0.8])
+    ax1.plot(df_monthly_returns)
+    ax1.set_xlabel("Date")
+    ax1.set_ylabel("Percent")
+    ax1.set_title("Monthly returns data")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    await ctx.send(file=file)
+    os.remove("Images/Stock.png")
+    #HISTOGRAM
+    fig = plt.figure()
+    ax1 = fig.add_axes([0.1,0.1,0.8,0.8])
+    df_daily_returns.plot.hist(bins = 60)
+    ax1.set_xlabel("Daily returns %")
+    ax1.set_ylabel("Percent")
+    ax1.set_title("daily returns data")
+    ax1.text(-0.35,200,"Extreme Low\nreturns")
+    ax1.text(0.25,200,"Extreme High\nreturns")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    await ctx.send(file=file)
+    os.remove("Images/Stock.png")
 
 @bot.command()
 async def Stock(ctx, stocksymbol: str):
@@ -180,4 +219,3 @@ async def About(ctx):
         title="Synapse", description='Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ', color=0xBB0000)
 
     await ctx.send(embed=embed)
-
