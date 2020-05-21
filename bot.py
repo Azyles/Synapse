@@ -262,13 +262,18 @@ async def Weather(ctx, City: str):
             title="Synapse",
             url="https://github.com/KingRegera/Synapse",
             description="Synapse Weather gets information with the help of openweathermap.org",
-            color=0x75ffee)
+            color=0x5C5D7F)
         embed.set_author(
             name="Kushagra Singh", url="https://github.com/KingRegera/Synapse")
         embed.set_thumbnail(url="https://i.imgur.com/Q66BhxI.png")
         embed.add_field(
             name="Temperature",
             value=str(format(round(current_temperature - 273.15, 2))) + "°C",
+            inline=False)
+        faren = (current_temperature-273.15)*9/5+32
+        embed.add_field(
+            name="Temperature",
+            value=str(format(round(faren, 2))) + "°F",
             inline=False)
         embed.add_field(
             name="atmospheric pressure",
@@ -285,6 +290,7 @@ async def Weather(ctx, City: str):
         embed = discord.Embed(
             title="Error", description="City Not Found", color=0xFF8080)
         await ctx.send(embed=embed)
+
 
 
 @bot.command()
