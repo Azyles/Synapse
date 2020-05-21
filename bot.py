@@ -120,4 +120,3 @@ async def About(ctx):
         title="Synapse", description='Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ', color=0xBB0000)
 
     await ctx.send(embed=embed)
-
