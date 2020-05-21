@@ -67,10 +67,6 @@ async def Graph(ctx, * stocksymbol):
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
 
-@bot.command()
-async def Predict(ctx, stocksymbol:str):
-    await ctx.send(stocker.predict.tomorrow(stocksymbol))
-
 
 
 @bot.command()
@@ -83,9 +79,9 @@ async def Analysis(ctx, stocksymbol: str):
     await ctx.send(embed=embed)
 
 @bot.command()
-async def stonks(ctx):
-    stock = si.get_live_price('TSLA')
-    if stock < 850:
+async def Stonks(ctx):
+    stock = si.get_live_price('DJI')
+    if stock < 24000:
         await ctx.send('https://i.kym-cdn.com/photos/images/newsfeed/001/499/826/2f0.png')
     else:
         await ctx.send('https://vmsseaglescall.org/wp-content/uploads/2019/10/Screen-Shot-2019-10-25-at-11.23.07-AM-475x260.png')
@@ -114,13 +110,14 @@ async def Data(ctx, stocksymbol,days = 0):
         await ctx.send(df.head())
 
 @bot.command()
-async def logo(ctx):
+async def Logo(ctx):
     await ctx.send('https://i.imgur.com/Q66BhxI.png')
 
 
 @bot.command()
-async def about(ctx):
+async def About(ctx):
     embed = discord.Embed(
-        title="Synapse", description='Hello Im synapse', color=0xBB0000)
+        title="Synapse", description='Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ', color=0xBB0000)
 
     await ctx.send(embed=embed)
+
