@@ -23,6 +23,7 @@ import pyfolio as pf
 from yahoo_fin import stock_info as si
 import stocker
 
+
 description = '''The ultimate bot'''
 
 bot = commands.Bot('X ', description=description)
@@ -67,6 +68,21 @@ async def Graph(ctx, * stocksymbol):
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
 
+@bot.command()
+async def CGraph(ctx,range:int ,* stocksymbol):
+    week = datetime.now() - timedelta(days=range)
+    df = web.DataReader(stocksymbol, 'yahoo',week,dt.datetime.now())
+    df['Adj Close'].plot(color=random.choice(graphcolor), linewidth=1,figsize=(10, 7))
+    plt.title("Adjusted Close Price of %s" % stocksymbol, fontsize=16)
+    plt.ylabel('Price', fontsize=14)
+    plt.xlabel('Days', fontsize=14)
+    plt.grid(which="major", color='k', linestyle='-.', linewidth=0.3)
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    df.reset_index(inplace=True)
+    df.set_index("Date", inplace=True)
+    await ctx.send(file=file)
+    os.remove("Images/Stock.png")
 
 
 @bot.command()
@@ -74,7 +90,7 @@ async def Analysis(ctx, stocksymbol: str):
     stock = si.get_live_price(stocksymbol)
     livevalue = format(round(stock, 2))
     embed = discord.Embed(
-        title=stocksymbol, description="Current Value: " + livevalue , color=0x00FFCD)
+        title=stocksymbol, description="Current Value: " + livevalue, color=0x00FFCD)
     await asyncio.sleep(1)
     await ctx.send(embed=embed)
 
@@ -87,10 +103,54 @@ async def Stonks(ctx):
         await ctx.send('https://vmsseaglescall.org/wp-content/uploads/2019/10/Screen-Shot-2019-10-25-at-11.23.07-AM-475x260.png')
 
 @bot.command()
+async def RiskReturn(ctx, stocksymbol:str,):
+    dfcomp = web.DataReader(stocksymbol, 'yahoo')
+    retscomp = dfcomp.pct_change()
+    plt.scatter(retscomp.mean(), retscomp.std())
+    plt.xlabel('Expected returns')
+    plt.ylabel('Risk')
+    for label, x, y in zip(retscomp.columns, retscomp.mean(), retscomp.std()):
+        plt.annotate(
+            label, 
+            xy = (x, y), xytext = (20, -20),
+            textcoords = 'offset points', ha = 'right', va = 'bottom',
+            bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5),
+            arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    await ctx.send(file=file)
+    os.remove("Images/Stock.png")
+
+@bot.command()
+async def XRiskReturn(ctx, stocksymbol:str,stocksymbol2:str,stocksymbol3:str,):
+    dfcomp = web.DataReader([stocksymbol,stocksymbol2,stocksymbol3], 'yahoo')
+    retscomp = dfcomp.pct_change()
+    plt.scatter(retscomp.mean(), retscomp.std())
+    plt.xlabel('Expected returns')
+    plt.ylabel('Risk')
+    for label, x, y in zip(retscomp.columns, retscomp.mean(), retscomp.std()):
+        plt.annotate(
+            label, 
+            xy = (x, y), xytext = (20, -20),
+            textcoords = 'offset points', ha = 'right', va = 'bottom',
+            bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5),
+            arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    await ctx.send(file=file)
+    os.remove("Images/Stock.png")
+
+
+@bot.command()
 async def Stock(ctx, stocksymbol: str):
     stock = si.get_live_price(stocksymbol)
     await ctx.send(format(round(stock, 2)))
     
+
+@bot.command()
+async def Predict(ctx, stocksymbol:str):
+    await ctx.send(stocker.predict.tomorrow(stocksymbol))
+
 
 @bot.command()
 async def Data(ctx, stocksymbol,days = 0): 
@@ -120,3 +180,4 @@ async def About(ctx):
         title="Synapse", description='Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ', color=0xBB0000)
 
     await ctx.send(embed=embed)
+
