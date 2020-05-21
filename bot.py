@@ -69,7 +69,7 @@ async def Graph(ctx, * stocksymbol):
 
 @bot.command()
 async def Predict(ctx, stocksymbol:str):
-    await ctx.send('Coming Soon')
+    await ctx.send(stocker.predict.tomorrow(stocksymbol))
 
 
 
@@ -78,7 +78,7 @@ async def Analysis(ctx, stocksymbol: str):
     stock = si.get_live_price(stocksymbol)
     livevalue = format(round(stock, 2))
     embed = discord.Embed(
-        title=stocksymbol, description="Current Value: " + livevalue +"\nChange: " + "X" , color=0x00FFCD)
+        title=stocksymbol, description="Current Value: " + livevalue , color=0x00FFCD)
     await asyncio.sleep(1)
     await ctx.send(embed=embed)
 
@@ -124,4 +124,3 @@ async def about(ctx):
         title="Synapse", description='Hello Im synapse', color=0xBB0000)
 
     await ctx.send(embed=embed)
-
