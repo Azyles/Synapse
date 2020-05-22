@@ -5,6 +5,7 @@ import time
 import os
 import discord
 from discord.ext import commands
+from keep_alive import keep_alive
 
 #StockPrice Imports
 import pandas as pd
@@ -14,19 +15,25 @@ from datetime import datetime, timedelta
 import datetime as dt
 import matplotlib.pyplot as plt
 from matplotlib import style
+from matplotlib.dates import DateFormatter
+import matplotlib.ticker as ticker
+
 import quandl
 #Specific
 import pyfolio as pf
 from yahoo_fin import stock_info as si
 import stocker
-import requests
-import json
-#Weather
+import requests, json
+#Covid
+from covid import Covid
+
+covid = Covid(source="worldometers")
+
 city_name = 'Monterey'
 api_key = "549b0eaf0ba1e27619cf96fb0ba32a1b"
 base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
-description = '''The ultimate bot'''
+description = '''Advanced Stock Analysis Bot'''
 
 bot = commands.Bot('X ', description=description)
 
@@ -247,7 +254,7 @@ async def Data(ctx, stocksymbol, days=0):
 
 
 @bot.command()
-async def Weather(ctx, City: str):
+async def Weather(ctx, *, City):
     complete_url = base_url + "appid=" + api_key + "&q=" + City
     response = requests.get(complete_url)
     x = response.json()
@@ -259,18 +266,20 @@ async def Weather(ctx, City: str):
         z = x["weather"]
         weather_description = z[0]["description"]
         embed = discord.Embed(
-            title="Synapse",
-            url="https://github.com/KingRegera/Synapse",
-            description="Synapse Weather gets information with the help of openweathermap.org",
+            title=City,
+            url="https://www.google.com/search?client=opera-gx&q=" + City +
+            "&sourceid=opera&ie=UTF-8&oe=UTF-8",
+            description=
+            "Synapse Weather gets information with the help of openweathermap.org",
             color=0x5C5D7F)
         embed.set_author(
-            name="Kushagra Singh", url="https://github.com/KingRegera/Synapse")
+            name='Synapse', url="https://github.com/KingRegera/Synapse")
         embed.set_thumbnail(url="https://i.imgur.com/Q66BhxI.png")
         embed.add_field(
             name="Temperature",
             value=str(format(round(current_temperature - 273.15, 2))) + "°C",
             inline=False)
-        faren = (current_temperature-273.15)*9/5+32
+        faren = (current_temperature - 273.15) * 9 / 5 + 32
         embed.add_field(
             name="Temperature",
             value=str(format(round(faren, 2))) + "°F",
@@ -292,6 +301,97 @@ async def Weather(ctx, City: str):
         await ctx.send(embed=embed)
 
 
+@bot.command()
+async def CovidGraph(ctx):
+    df = pd.read_csv(
+        'https://raw.githubusercontent.com/datasets/covid-19/master/data/countries-aggregated.csv',
+        parse_dates=['Date'])
+    countries = [
+        'Canada', 'Germany', 'United Kingdom', 'US', 'France', 'China'
+    ]
+    df = df[df['Country'].isin(countries)]
+
+    # Section 3 - Creating a Summary Column
+    df['Cases'] = df[['Confirmed', 'Recovered', 'Deaths']].sum(axis=1)
+    df = df.pivot(index='Date', columns='Country', values='Cases')
+    countries = list(df.columns)
+    covid = df.reset_index('Date')
+    covid.set_index(['Date'], inplace=True)
+    covid.columns = countries
+
+    # Section 5 - Calculating Rates per 100,000
+    populations = {
+        'Canada': 37664517,
+        'Germany': 83721496,
+        'United Kingdom': 67802690,
+        'US': 330548815,
+        'France': 65239883,
+        'China': 1438027228
+    }
+    percapita = covid.copy()
+    for country in list(percapita.columns):
+        percapita[country] = percapita[country] / populations[country] * 100000
+    colors = {
+        'Canada': '#045275',
+        'China': '#089099',
+        'France': '#7CCBA2',
+        'Germany': '#FCDE9C',
+        'US': '#DC3977',
+        'United Kingdom': '#7C1D6F'
+    }
+    plt.style.use('fivethirtyeight')
+
+    # Section 7 - Creating the Visualization
+    plot = covid.plot(
+        figsize=(12, 8),
+        color=list(colors.values()),
+        linewidth=5,
+        legend=False)
+    plot.yaxis.set_major_formatter(ticker.StrMethodFormatter('{x:,.0f}'))
+    plot.grid(color='#d4d4d4')
+    plot.set_xlabel('Date')
+    plot.set_ylabel('# of Cases')
+
+    # Section 8 - Assigning Colour
+    for country in list(colors.keys()):
+        plot.text(
+            x=covid.index[-1],
+            y=covid[country].max(),
+            color=colors[country],
+            s=country,
+            weight='bold')
+
+    # Section 9 - Adding Labels
+    plot.text(
+        x=covid.index[1],
+        y=int(covid.max().max()) + 45000,
+        s="COVID-19 Cases by Country",
+        fontsize=23,
+        weight='bold',
+        alpha=.75)
+    plot.text(
+        x=covid.index[1],
+        y=int(covid.max().max()) + 15000,
+        s="",
+        fontsize=16,
+        alpha=.75)
+    plot.text(
+        x=percapita.index[1],
+        y=-100000,
+        s=
+        'datagy.io                      Source: https://github.com/datasets/covid-19/blob/master/data/countries-aggregated.csv',
+        fontsize=10)
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    await ctx.send(file=file)
+    os.remove("Images/Stock.png")
+
+
+@bot.command()
+async def Covid19(ctx, Country: str):
+    x = covid.get_status_by_country_name(Country)
+    await ctx.send(x)
+
 
 @bot.command()
 async def Logo(ctx):
@@ -302,7 +402,11 @@ async def Logo(ctx):
 async def About(ctx):
     embed = discord.Embed(
         title="Synapse",
-        description='Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ',
+        description=
+        'Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ',
         color=0xBB0000)
 
     await ctx.send(embed=embed)
+
+
+keep_alive()
