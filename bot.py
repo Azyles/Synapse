@@ -42,7 +42,9 @@ activeactivity = [
     'Calculating Stock Prices'
 ]
 
-graphcolor = ['Red', 'Blue', 'Green', 'Orange', 'Pink']
+graphcolor = ['Cyan']
+
+plt.style.use('dark_background')
 
 
 @bot.event
@@ -78,7 +80,7 @@ async def Graph(ctx, *stocksymbol):
     plt.title("Adjusted Close Price of %s" % stocksymbol, fontsize=16)
     plt.ylabel('Price', fontsize=14)
     plt.xlabel('Year', fontsize=14)
-    plt.grid(which="major", color='k', linestyle='-.', linewidth=0.3)
+    plt.grid(which="major", color='grey', linestyle='-.', linewidth=0.3)
     plt.savefig("Images/Stock.png")
     file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     df.reset_index(inplace=True)
@@ -267,8 +269,6 @@ async def Weather(ctx, *, City):
         weather_description = z[0]["description"]
         embed = discord.Embed(
             title=City,
-            url="https://www.google.com/search?client=opera-gx&q=" + City +
-            "&sourceid=opera&ie=UTF-8&oe=UTF-8",
             description=
             "Synapse Weather gets information with the help of openweathermap.org",
             color=0x5C5D7F)
@@ -392,21 +392,36 @@ async def Covid19(ctx, Country: str):
     x = covid.get_status_by_country_name(Country)
     await ctx.send(x)
 
+@bot.command()
+async def HostTest(ctx, Country: str):
+  print('----')
+  print('TEST')
+  print('----')
+
+
 
 @bot.command()
 async def Logo(ctx):
-    await ctx.send('https://i.imgur.com/Q66BhxI.png')
+    await ctx.send('https://i.imgur.com/WkqngoQ.png')
 
 
 @bot.command()
 async def About(ctx):
-    embed = discord.Embed(
-        title="Synapse",
-        description=
-        'Hello Im synapse\n**Commands:** \n **Get week data:**X Data (STOCK) \n **Get graph:** X Graph (STOCK) \n **Get predicted value for tommorow:**X Predict (STOCK) ',
-        color=0xBB0000)
-
-    await ctx.send(embed=embed)
+  embed=discord.Embed(title="About", description="The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.",color=0x5C5D7F)
+  embed.set_author(name="Kushagra Singh", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+  embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+  embed.add_field(name="Stock Price", value="X Stock (Symbol)", inline=False)
+  embed.add_field(name="Graph", value="X Graph (Symbol)", inline=False)
+  embed.add_field(name="Custom Graph", value="X CGraph (days) (Symbol)", inline=False)
+  embed.add_field(name="Stock Data", value="X Data (Symbol)", inline=False)
+  embed.add_field(name="Stock Return", value="X Return (Symbol)", inline=False)
+  embed.add_field(name="Prediction", value="X Predict (Symbol)", inline=False)
+  embed.add_field(name="Analysis", value="X Analysis (Symbol)", inline=False)
+  embed.add_field(name="Weather", value="X Weather (City)", inline=False)
+  embed.add_field(name="Logo", value="X Logo", inline=False)
+  embed.add_field(name="About", value="X About", inline=False)
+  embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+  await ctx.send(embed=embed)
 
 
 keep_alive()
