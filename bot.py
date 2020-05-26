@@ -80,12 +80,12 @@ async def Graph(ctx, *stocksymbol):
     plt.ylabel('Price', fontsize=14)
     plt.xlabel('Year', fontsize=14)
     plt.grid(which="major", color='grey', linestyle='-.', linewidth=0.3)
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
     df.reset_index(inplace=True)
     df.set_index("Date", inplace=True)
     await ctx.send(file=file)
-    os.remove("Images/Stock.png")
+    os.remove("Stock.png")
 
 
 @bot.command()
@@ -98,12 +98,12 @@ async def CGraph(ctx, range: int, *stocksymbol):
     plt.ylabel('Price', fontsize=14)
     plt.xlabel('Days', fontsize=14)
     plt.grid(which="major", color='k', linestyle='-.', linewidth=0.3)
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
     df.reset_index(inplace=True)
     df.set_index("Date", inplace=True)
     await ctx.send(file=file)
-    os.remove("Images/Stock.png")
+    os.remove("Stock.png")
 
 
 @bot.command()
@@ -150,10 +150,10 @@ async def RiskReturn(
             va='bottom',
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
             arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
     await ctx.send(file=file)
-    os.remove("Images/Stock.png")
+    os.remove("Stock.png")
 
 
 @bot.command()
@@ -178,10 +178,10 @@ async def XRiskReturn(
             va='bottom',
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
             arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
     await ctx.send(file=file)
-    os.remove("Images/Stock.png")
+    os.remove("Stock.png")
 
 
 @bot.command()
@@ -195,10 +195,10 @@ async def Return(ctx, stocksymbol: str):
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Percent")
     ax1.set_title("daily returns data")
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
     await ctx.send(file=file)
-    os.remove("Images/Stock.png")
+    os.remove("Stock.png")
     #monthly
     fig = plt.figure()
     ax1 = fig.add_axes([0.1, 0.1, 0.8, 0.8])
@@ -206,10 +206,10 @@ async def Return(ctx, stocksymbol: str):
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Percent")
     ax1.set_title("Monthly returns data")
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
     await ctx.send(file=file)
-    os.remove("Images/Stock.png")
+    os.remove("Stock.png")
     #HISTOGRAM
     fig = plt.figure()
     ax1 = fig.add_axes([0.1, 0.1, 0.8, 0.8])
@@ -219,10 +219,10 @@ async def Return(ctx, stocksymbol: str):
     ax1.set_title("daily returns data")
     ax1.text(-0.35, 200, "Extreme Low\nreturns")
     ax1.text(0.25, 200, "Extreme High\nreturns")
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
     await ctx.send(file=file)
-    os.remove("Images/Stock.png")
+    os.remove("Stock.png")
 
 
 @bot.command()
@@ -380,10 +380,10 @@ async def CovidGraph(ctx):
         s=
         'datagy.io                      Source: https://github.com/datasets/covid-19/blob/master/data/countries-aggregated.csv',
         fontsize=10)
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
+    plt.savefig("Stock.png")
+    file = discord.File("Stock.png", filename="Stock.png")
     await ctx.send(file=file)
-    os.remove("Images/Stock.png")
+    os.remove("Stock.png")
 
 
 @bot.command()
@@ -421,7 +421,6 @@ async def About(ctx):
   embed.add_field(name="About", value="X About", inline=False)
   embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
   await ctx.send(embed=embed)
-
 
 
 a = 'NzEyNTE1NTMyN'
