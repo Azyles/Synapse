@@ -5,7 +5,6 @@ import time
 import os
 import discord
 from discord.ext import commands
-from keep_alive import keep_alive
 
 #StockPrice Imports
 import pandas as pd
@@ -424,5 +423,4 @@ async def About(ctx):
   await ctx.send(embed=embed)
 
 
-keep_alive()
 
