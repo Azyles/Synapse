@@ -424,3 +424,12 @@ async def About(ctx):
 
 
 
+a = 'NzEyNTE1NTMyN'
+
+b = 'jgyOTUyNzM1.XsyZNg.HPfHffkr5Q7Eju_E1Hhr0NWBNAw'
+
+c = 'ZNg.HPfHffkr5Q7Eju_E1Hhr0NWBNAw'
+
+d = 'r5Q7Eju_E1Hhr0NWBNAw'
+
+bot.run(a+b+c+d)
