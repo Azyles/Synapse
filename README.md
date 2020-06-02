@@ -1,0 +1,2 @@
+# Synapse
+Discord bot
