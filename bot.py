@@ -1,10 +1,9 @@
 import asyncio
-import base64
 import random
-import time
 import os
 import discord
 from discord.ext import commands
+
 
 #StockPrice Imports
 import pandas as pd
@@ -14,17 +13,14 @@ from datetime import datetime, timedelta
 import datetime as dt
 import matplotlib.pyplot as plt
 from matplotlib import style
-from matplotlib.dates import DateFormatter
 import matplotlib.ticker as ticker
 
-import quandl
 #Specific
-import pyfolio as pf
 from yahoo_fin import stock_info as si
 import stocker
-import requests, json
 #Covid
 from covid import Covid
+import requests, json
 
 covid = Covid(source="worldometers")
 
@@ -80,16 +76,16 @@ async def Graph(ctx, *stocksymbol):
     plt.ylabel('Price', fontsize=14)
     plt.xlabel('Year', fontsize=14)
     plt.grid(which="major", color='grey', linestyle='-.', linewidth=0.3)
-    plt.savefig("Stock.png")
-    file = discord.File("Stock.png", filename="Stock.png")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     df.reset_index(inplace=True)
     df.set_index("Date", inplace=True)
     await ctx.send(file=file)
-    os.remove("Stock.png")
+    os.remove("Images/Stock.png")
 
 
 @bot.command()
-async def CGraph(ctx, range: int, *stocksymbol):
+async def CGraph(ctx, stocksymbol, range: int):
     week = datetime.now() - timedelta(days=range)
     df = web.DataReader(stocksymbol, 'yahoo', week, dt.datetime.now())
     df['Adj Close'].plot(
@@ -98,24 +94,78 @@ async def CGraph(ctx, range: int, *stocksymbol):
     plt.ylabel('Price', fontsize=14)
     plt.xlabel('Days', fontsize=14)
     plt.grid(which="major", color='k', linestyle='-.', linewidth=0.3)
-    plt.savefig("Stock.png")
-    file = discord.File("Stock.png", filename="Stock.png")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     df.reset_index(inplace=True)
     df.set_index("Date", inplace=True)
     await ctx.send(file=file)
-    os.remove("Stock.png")
+    os.remove("Images/Stock.png")
 
 
 @bot.command()
 async def Analysis(ctx, stocksymbol: str):
-    stock = si.get_live_price(stocksymbol)
-    livevalue = format(round(stock, 2))
-    embed = discord.Embed(
-        title=stocksymbol,
-        description="Current Value: " + livevalue,
-        color=0x00FFCD)
-    await asyncio.sleep(1)
+    r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
+    j=r.json()
+    embed=discord.Embed(title="About", description="Stock Analysis",color=0x5C5D7F)
+    embed.set_author(name="Kushagra Singh", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+    embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+    embed.add_field(name="Current Price", value=j["c"], inline=False)
+    embed.add_field(name="Open Price", value=j["o"], inline=False)
+    embed.add_field(name="High Price", value=j["h"], inline=False)
+    embed.add_field(name="Low Price", value=j["l"], inline=False)
+    embed.add_field(name="Previous Close Price", value=j["pc"], inline=False)
+    embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
     await ctx.send(embed=embed)
+
+@bot.command()
+async def Stock(ctx, stocksymbol: str):
+    r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
+    j=r.json()
+    embed=discord.Embed(title="About", description="Stock Analysis",color=0x5C5D7F)
+    embed.set_author(name="Kushagra Singh", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+    embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+    embed.add_field(name="Current Price", value=j["c"], inline=False)
+    embed.add_field(name="Open Price", value=j["o"], inline=False)
+    embed.add_field(name="High Price", value=j["h"], inline=False)
+    embed.add_field(name="Low Price", value=j["l"], inline=False)
+    embed.add_field(name="Previous Close Price", value=j["pc"], inline=False)
+    embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def Company(ctx, stocksymbol: str):
+    r = requests.get('https://finnhub.io/api/v1/stock/profile2?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
+    j=r.json()
+    embed=discord.Embed(title=j["name"], description="Stock Analysis",color=0x5C5D7F)
+    embed.set_author(name="SynapseBot", url="https://github.com/KingRegera", icon_url="https://i.imgur.com/WkqngoQ.png")
+    embed.set_thumbnail(url=j["logo"])
+    embed.add_field(name="Country", value=j["country"], inline=False)
+    embed.add_field(name="exchange", value=j["exchange"], inline=False)
+    embed.add_field(name="Name", value=j["name"], inline=False)
+    embed.add_field(name="marketCapitalization", value=j["marketCapitalization"], inline=False)
+    embed.add_field(name="Industry", value=j["finnhubIndustry"], inline=False)
+    embed.set_footer(text=j["weburl"])
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def Rating(ctx, stocksymbol: str):
+    r = requests.get('https://www.alphavantage.co/query?function=CRYPTO_RATING&symbol='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f=r.json()
+    j = f['Crypto Rating (FCAS)']
+    embed=discord.Embed(title=j["2. name"], description="Crypto Rating",color=0x5C5D7F)
+    embed.set_author(name="SynapseBot", url="https://github.com/KingRegera", icon_url="https://i.imgur.com/WkqngoQ.png")
+    embed.set_thumbnail(url="https://i.imgur.com/SYIs6VF.jpg")
+    embed.add_field(name="Symbol", value=j["1. symbol"], inline=False)
+    embed.add_field(name="Fcas Rating", value=j["3. fcas rating"], inline=False)
+    embed.add_field(name="Fcas score", value=j["4. fcas score"], inline=False)
+    embed.add_field(name="Developer Score", value=j["5. developer score"], inline=False)
+    embed.add_field(name="Market Maturity Score", value=j["6. market maturity score"], inline=False)
+    embed.add_field(name="Utility Score", value=j["7. utility score"], inline=False)
+    embed.add_field(name="Last Refreshed", value=j["8. last refreshed"], inline=False)
+    embed.add_field(name="Timezone", value=j["9. timezone"], inline=False)
+    embed.set_footer(text=j["2. name"])
+    await ctx.send(embed=embed)
+
 
 
 @bot.command()
@@ -150,10 +200,10 @@ async def RiskReturn(
             va='bottom',
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
             arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
-    plt.savefig("Stock.png")
-    file = discord.File("Stock.png", filename="Stock.png")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
-    os.remove("Stock.png")
+    os.remove("Images/Stock.png")
 
 
 @bot.command()
@@ -178,10 +228,10 @@ async def XRiskReturn(
             va='bottom',
             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
             arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
-    plt.savefig("Stock.png")
-    file = discord.File("Stock.png", filename="Stock.png")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
-    os.remove("Stock.png")
+    os.remove("Images/Stock.png")
 
 
 @bot.command()
@@ -195,10 +245,10 @@ async def Return(ctx, stocksymbol: str):
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Percent")
     ax1.set_title("daily returns data")
-    plt.savefig("Stock.png")
-    file = discord.File("Stock.png", filename="Stock.png")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
-    os.remove("Stock.png")
+    os.remove("Images/Stock.png")
     #monthly
     fig = plt.figure()
     ax1 = fig.add_axes([0.1, 0.1, 0.8, 0.8])
@@ -206,10 +256,10 @@ async def Return(ctx, stocksymbol: str):
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Percent")
     ax1.set_title("Monthly returns data")
-    plt.savefig("Stock.png")
-    file = discord.File("Stock.png", filename="Stock.png")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
-    os.remove("Stock.png")
+    os.remove("Images/Stock.png")
     #HISTOGRAM
     fig = plt.figure()
     ax1 = fig.add_axes([0.1, 0.1, 0.8, 0.8])
@@ -219,16 +269,10 @@ async def Return(ctx, stocksymbol: str):
     ax1.set_title("daily returns data")
     ax1.text(-0.35, 200, "Extreme Low\nreturns")
     ax1.text(0.25, 200, "Extreme High\nreturns")
-    plt.savefig("Stock.png")
-    file = discord.File("Stock.png", filename="Stock.png")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
-    os.remove("Stock.png")
-
-
-@bot.command()
-async def Stock(ctx, stocksymbol: str):
-    stock = si.get_live_price(stocksymbol)
-    await ctx.send(format(round(stock, 2)))
+    os.remove("Images/Stock.png")
 
 
 @bot.command()
@@ -380,10 +424,10 @@ async def CovidGraph(ctx):
         s=
         'datagy.io                      Source: https://github.com/datasets/covid-19/blob/master/data/countries-aggregated.csv',
         fontsize=10)
-    plt.savefig("Stock.png")
-    file = discord.File("Stock.png", filename="Stock.png")
+    plt.savefig("Images/Stock.png")
+    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
-    os.remove("Stock.png")
+    os.remove("Images/Stock.png")
 
 
 @bot.command()
@@ -421,14 +465,3 @@ async def About(ctx):
   embed.add_field(name="About", value="X About", inline=False)
   embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
   await ctx.send(embed=embed)
-
-
-a = 'NzEyNTE1NTMyN'
-
-b = 'jgyOTUyNzM1.XsyZNg.HPfHffkr5Q7Eju_E1Hhr0NWBNAw'
-
-c = 'ZNg.HPfHffkr5Q7Eju_E1Hhr0NWBNAw'
-
-d = 'r5Q7Eju_E1Hhr0NWBNAw'
-
-bot.run(a+b+c+d)
