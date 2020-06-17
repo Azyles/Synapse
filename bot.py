@@ -148,14 +148,21 @@ async def Company(ctx, stocksymbol: str):
     await ctx.send(embed=embed)
 
 @bot.command()
-async def Rating(ctx, stocksymbol: str):
+async def Crypto(ctx, stocksymbol: str):
     r = requests.get('https://www.alphavantage.co/query?function=CRYPTO_RATING&symbol='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
     f=r.json()
     j = f['Crypto Rating (FCAS)']
+    a = requests.get('https://api.nomics.com/v1/currencies/ticker?key=9cfc5a1350155356f898ab4ecca3764e&ids=BTC')
+    b=a.json()
     embed=discord.Embed(title=j["2. name"], description="Crypto Rating",color=0x5C5D7F)
     embed.set_author(name="SynapseBot", url="https://github.com/KingRegera", icon_url="https://i.imgur.com/WkqngoQ.png")
     embed.set_thumbnail(url="https://i.imgur.com/SYIs6VF.jpg")
     embed.add_field(name="Symbol", value=j["1. symbol"], inline=False)
+    embed.add_field(name="Value", value=str(b["price"]), inline=False)
+    embed.add_field(name="Rank", value=str(b["rank"]), inline=False)
+    embed.add_field(name="Circulating Supply", value=str(b["circulating_supply"]), inline=False)
+    embed.add_field(name="Max Supply", value=str(b["max_supply"]), inline=False)
+    embed.add_field(name="Market Cap", value=str(b["market_cap"]), inline=False)
     embed.add_field(name="Fcas Rating", value=j["3. fcas rating"], inline=False)
     embed.add_field(name="Fcas score", value=j["4. fcas score"], inline=False)
     embed.add_field(name="Developer Score", value=j["5. developer score"], inline=False)
