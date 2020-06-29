@@ -327,6 +327,66 @@ async def Start(ctx):
         u'Cash': 10000,
     })
 
+@bot.command()
+async def Buy(ctx, stocksymbol, amount):
+    doc_ref = db.collection(u'UserData').document(str(ctx.author.id))
+    doc = doc_ref.get()
+    if doc.exists:
+        users_ref = db.collection(u'UserData').document(str(ctx.author.id))
+        docs = users_ref.get({u'Cash'})
+        bal = u'{}'.format(docs.to_dict()['Cash'])
+        if bal < amount:
+            await ctx.send("Purchase exceds balance")
+        else:
+            doc_ref = db.collection(u'UserData').document(str(ctx.author.id))
+            doc = doc_ref.get()
+            check = users_ref.get(stocksymbol)
+            ownshares = u'{}'.format(check.to_dict()[f'{stocksymbol}'])
+            if isinstance(ownshares, int):
+                r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
+                j=r.json()
+                sharevalue = j['c']
+                sharesbought = amount/sharevalue
+                print(sharesbought)
+                ownshares = ownshares + sharesbought
+                newbalance = bal - amount
+                doc_refr = db.collection(u'UserData').document(str(ctx.author.id))
+                doc_refr.set({
+                    u'Cash': newbalance,
+                    stocksymbol: ownshares,
+                })
+                embed=discord.Embed(title="Purchase Successful", description="Successfully purchased stocks",color=0x5C5D7F)
+                embed.set_author(name="Synapse Xsim", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+                embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+                embed.add_field(name="Balance", value=bal, inline=False)
+                embed.add_field(name="Shares Bought", value=sharesbought, inline=False)
+                embed.add_field(name="Shares Owned", value=ownshares, inline=False)
+                embed.add_field(name="Buy Price", value=j["c"], inline=False)
+                embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+                await ctx.send(embed=embed)     
+            else:
+                r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
+                j=r.json()
+                sharevalue = j['c']
+                sharesbought = amount/sharevalue
+                print(sharesbought)
+                newbalance = bal - amount
+                doc_refr = db.collection(u'UserData').document(str(ctx.author.id))
+                doc_refr.set({
+                    u'Cash': newbalance,
+                    stocksymbol: sharesbought,
+                })
+                embed=discord.Embed(title="Purchase Successful", description="Successfully purchased stocks",color=0x5C5D7F)
+                embed.set_author(name="Synapse Xsim", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+                embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+                embed.add_field(name="Balance", value=bal, inline=False)
+                embed.add_field(name="Shares Bought", value=sharesbought, inline=False)
+                embed.add_field(name="Buy Price", value=j["c"], inline=False)
+                embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+                await ctx.send(embed=embed)     
+    else:
+        await ctx.send("Account not setup use the following command to set up account `X Start`")
+
 
 @bot.command()
 async def Weather(ctx, *, City):
