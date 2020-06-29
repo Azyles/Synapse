@@ -4,6 +4,17 @@ import os
 import discord
 from discord.ext import commands
 
+#SynapseInvestor
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+cred = credentials.Certificate('/Users/kush/Developer/Keys/SynapseBot-02ec52c4b1b0.json')
+firebase_admin.initialize_app(cred, {
+  'projectId': "synapsebot-fb65a",
+})
+
+db = firestore.client()
+
 
 #StockPrice Imports
 import pandas as pd
@@ -117,6 +128,7 @@ async def Analysis(ctx, stocksymbol: str):
     embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
     await ctx.send(embed=embed)
 
+
 @bot.command()
 async def Stock(ctx, stocksymbol: str):
     r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
@@ -132,6 +144,7 @@ async def Stock(ctx, stocksymbol: str):
     embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
     await ctx.send(embed=embed)
 
+
 @bot.command()
 async def Company(ctx, stocksymbol: str):
     r = requests.get('https://finnhub.io/api/v1/stock/profile2?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
@@ -146,6 +159,7 @@ async def Company(ctx, stocksymbol: str):
     embed.add_field(name="Industry", value=j["finnhubIndustry"], inline=False)
     embed.set_footer(text=j["weburl"])
     await ctx.send(embed=embed)
+
 
 @bot.command()
 async def Crypto(ctx, stocksymbol: str):
@@ -172,7 +186,6 @@ async def Crypto(ctx, stocksymbol: str):
     embed.add_field(name="Timezone", value=j["9. timezone"], inline=False)
     embed.set_footer(text=j["2. name"])
     await ctx.send(embed=embed)
-
 
 
 @bot.command()
@@ -303,6 +316,16 @@ async def Data(ctx, stocksymbol, days=0):
         df.reset_index(inplace=True)
         df.set_index("Date", inplace=True)
         await ctx.send(df.head())
+
+
+@bot.command()
+async def Start(ctx):
+    doc_ref = db.collection(u'UserData').document(str(ctx.author.id))
+    doc_ref.set({
+        u'Name': ctx.author.name,
+        u'Tier': 1,
+        u'Cash': 10000,
+    })
 
 
 @bot.command()
@@ -442,12 +465,12 @@ async def Covid19(ctx, Country: str):
     x = covid.get_status_by_country_name(Country)
     await ctx.send(x)
 
+
 @bot.command()
 async def HostTest(ctx, Country: str):
   print('----')
   print('TEST')
   print('----')
-
 
 
 @bot.command()
@@ -472,3 +495,6 @@ async def About(ctx):
   embed.add_field(name="About", value="X About", inline=False)
   embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
   await ctx.send(embed=embed)
+
+
+bot.run('NzEyNTE1NTMyNjgyOTUyNzM1.Xsb8tg.eUjv-ebWkfhtCVANv0t1uyv5ILw')
