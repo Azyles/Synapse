@@ -349,8 +349,8 @@ async def Buy(ctx, stocksymbol, amount: int):
                 docs = getsharesc.get({u'Shares'})
                 ownshares = u'{}'.format(docs.to_dict()['Shares'])
                 sharesbought = amount/sharevalue
-                ownshares = ownshares + sharesbought
-                newbalance = bal - amount
+                ownshares = int(float(ownshares)) + sharesbought
+                newbalance = int(bal) - amount
                 doc_refr = db.collection(str(ctx.author.id)).document(str(stocksymbol))
                 doc_refr.set({
                     u'Shares': ownshares,
@@ -362,7 +362,6 @@ async def Buy(ctx, stocksymbol, amount: int):
                 embed=discord.Embed(title="Purchase Successful", description="Successfully purchased stocks",color=0x5C5D7F)
                 embed.set_author(name="Synapse Xsim", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
                 embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
-                embed.add_field(name="Balance", value=bal, inline=False)
                 embed.add_field(name="Shares Bought", value=sharesbought, inline=False)
                 embed.add_field(name="Buy Price", value=j["c"], inline=False)
                 embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
@@ -387,7 +386,6 @@ async def Buy(ctx, stocksymbol, amount: int):
                 embed=discord.Embed(title="Purchase Successful", description="Successfully purchased stocks",color=0x5C5D7F)
                 embed.set_author(name="Synapse Xsim", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
                 embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
-                embed.add_field(name="Balance", value=str(bal), inline=False)
                 embed.add_field(name="Buy Price", value=j["c"], inline=False)
                 embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
                 await ctx.send(embed=embed)   
