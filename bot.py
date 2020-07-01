@@ -328,13 +328,77 @@ async def Start(ctx):
     })
 
 @bot.command()
+async def Portfolio(ctx):
+    users_ref = db.collection(str(ctx.author.id))
+    docs = users_ref.stream()
+    for doc in docs:
+        if doc == "UserData":
+            print("Ignore")
+        else:
+            stock = doc.id
+            r = requests.get('https://finnhub.io/api/v1/quote?symbol='+str(stock)+'&token=bre3nkfrh5rckh454te0')
+            j=r.json()
+            sharevalue = j['c']
+            refrence = db.collection(str(ctx.author.id)).document(str(stock)) 
+            cash = refrence.get({u'Shares'})
+            value = u'{}'.format(cash.to_dict()['Shares'])
+            sharecashvalue = float(sharevalue) * float(value)
+            await ctx.send(f'{doc.id}: {str(sharecashvalue)}')
+
+
+
+@bot.command()
+async def Sell(ctx, stocksymbol, amount: int):
+    doc_ref = db.collection(str(ctx.author.id)).document(u'UserData') 
+    doc = doc_ref.get()
+    docs = doc_ref.get({u'Cash'})
+    bal = u'{}'.format(docs.to_dict()['Cash'])
+    if doc.exists:
+        doc_refren = db.collection(str(ctx.author.id)).document(str(stocksymbol)) 
+        stockown = doc_refren.get()
+        if stockown.exists:
+            r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
+            j=r.json()
+            sharevalue = j['c']
+            shareown = doc_refren.get({u'Shares'})
+            shareowned = u'{}'.format(shareown.to_dict()['Shares'])
+            print(float(shareowned))
+            sharestocash = float(shareowned)*sharevalue
+            print(sharestocash)
+            if int(sharestocash) >= amount:
+                sharesselling = amount/sharevalue
+                print(sharesselling)
+                newownedshares = float(shareowned) - sharesselling
+                print(newownedshares)
+                newbalance = int(bal) + amount
+                print(newbalance)
+                doc_refr = db.collection(str(ctx.author.id)).document(str(stocksymbol))
+                doc_refr.set({
+                    u'Shares': newownedshares,
+                })
+                doc_refm = db.collection(str(ctx.author.id)).document("UserData")
+                doc_refm.set({
+                    u'Cash': newbalance,
+                })
+                embed=discord.Embed(title="Sell Successful", description="Successfully sold stocks",color=0x5C5D7F)
+                embed.set_author(name="Synapse Xsim", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+                embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+                embed.add_field(name="Sell Price", value=j["c"], inline=False)
+                embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+                await ctx.send(embed=embed) 
+            else:
+                await ctx.send("`Sell excedes owned value`")
+        else:
+            await ctx.send("`No shares to sell`")
+    else:
+        await ctx.send("User not found, please do the following command `X Start`")
+
+@bot.command()
 async def Buy(ctx, stocksymbol, amount: int):
     doc_ref = db.collection(str(ctx.author.id)).document(u'UserData') 
     doc = doc_ref.get()
-    print('a')
     if doc.exists:
         docs = doc_ref.get({u'Cash'})
-        print('b')
         bal = u'{}'.format(docs.to_dict()['Cash'])
         if int(bal) < amount:
             await ctx.send("Purchase exceds balance")
@@ -367,14 +431,11 @@ async def Buy(ctx, stocksymbol, amount: int):
                 embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
                 await ctx.send(embed=embed)   
             else:
-                print('c')
                 r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
                 j=r.json()
                 sharevalue = j['c']
                 sharesbought = amount/sharevalue
-                print('d')
                 newbalance = int(bal) - amount
-                print('e')
                 doc_refr = db.collection(str(ctx.author.id)).document(str(stocksymbol))
                 doc_refr.set({
                     u'Shares': sharesbought,
