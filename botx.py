@@ -28,6 +28,7 @@ import matplotlib.ticker as ticker
 
 #Specific
 from yahoo_fin import stock_info as si
+import stocker
 #Covid
 from covid import Covid
 import requests, json
@@ -43,7 +44,7 @@ description = '''Advanced Stock Analysis Bot'''
 bot = commands.Bot('X ', description=description)
 
 activeactivity = [
-    'Analyzing Market...'
+    'Predicting Stock Prices'
 ]
 
 graphcolor = ['Cyan']
@@ -291,6 +292,11 @@ async def Return(ctx, stocksymbol: str):
     file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
+
+
+@bot.command()
+async def Predict(ctx, stocksymbol: str):
+    await ctx.send(stocker.predict.tomorrow(stocksymbol))
 
 
 @bot.command()
@@ -615,4 +621,4 @@ async def About(ctx):
   await ctx.send(embed=embed)
 
 
-bot.run('NzEyNTE1NTMyNjgyOTUyNzM1.Xsb8tg.eUjv-ebWkfhtCVANv0t1uyv5ILw')
+bot.run('NzEzNDczMTE5MTc1ODM1NzU5.Xvzrpw.1B5dlreGZzUBCYCcecAhmW7X71U')
