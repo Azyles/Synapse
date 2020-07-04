@@ -3,12 +3,14 @@ import random
 import os
 import discord
 from discord.ext import commands
+from keep_alive import keep_alive
 
+from datetime import datetime
 #SynapseInvestor
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-cred = credentials.Certificate('/Users/kush/Developer/Keys/SynapseBot-02ec52c4b1b0.json')
+cred = credentials.Certificate('SynapseBot-02ec52c4b1b0.json')
 firebase_admin.initialize_app(cred, {
   'projectId': "synapsebot-fb65a",
 })
@@ -41,7 +43,7 @@ base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
 description = '''Advanced Stock Analysis Bot'''
 
-bot = commands.Bot('X ', description=description)
+bot = commands.Bot('Xe ', description=description)
 
 activeactivity = [
     'Predicting Stock Prices'
@@ -67,6 +69,7 @@ async def on_ready():
 @bot.command()
 async def ping(ctx):
     ping = round(bot.latency * 1000)
+    print(ping)
     await ctx.send(f"The ping of this bot is {ping} ms")
 
 
@@ -75,6 +78,31 @@ async def a(ctx, *message):
     channel = bot.get_channel(699328249154633768)
     text = ' '.join(message)
     await channel.send(text)
+
+
+@bot.command()
+async def pinger(ctx, interval, times):
+    br = str(interval)
+    global massPing
+    if br == "break":
+        massPing= False
+        await ctx.send("Mass ping broken")
+    else:
+        massPing = True
+        while massPing:
+            x=0
+            y= int(times) 
+            i = int(interval)
+            while x < y:
+                channel = bot.get_channel(728315394040791061)
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                await channel.send(current_time)
+                print(current_time)
+                await asyncio.sleep(i)
+                x = x+1
+                if massPing == False:
+                    x=y + 1
 
 
 @bot.command()
@@ -620,5 +648,5 @@ async def About(ctx):
   embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
   await ctx.send(embed=embed)
 
-
+keep_alive()
 bot.run('NzEzNDczMTE5MTc1ODM1NzU5.Xvzrpw.1B5dlreGZzUBCYCcecAhmW7X71U')
