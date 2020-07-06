@@ -64,6 +64,24 @@ async def on_ready():
     print('status set to online')
     print(bot.user.id)
     print('--------------------')
+    br = str(600)
+    global massPing
+    if br == "break":
+        massPing= False
+    else:
+        massPing = True
+        while massPing:
+            x=0
+            y= int(100) 
+            i = int(600)
+            while x < y:
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                print(current_time)
+                await asyncio.sleep(i)
+                x = x+1
+                if massPing == False:
+                    x=y + 1
 
 
 @bot.command()
@@ -138,6 +156,100 @@ async def CGraph(ctx, stocksymbol, range: int):
     df.set_index("Date", inplace=True)
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
+
+
+@bot.command()
+async def AdvancedData(ctx, stocksymbol: str):
+    r = requests.get('https://finnhub.io/api/v1/stock/metric?symbol='+stocksymbol+'&metric=all&token=bre3nkfrh5rckh454te0')
+    e=r.json()
+    j = e['metric']
+
+    embed=discord.Embed(title=e['symbol'], description="Stock Analysis",color=0x5C5D7F)
+    embed.set_author(name="Synapse", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+    embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+    embed.add_field(name="10DayAverageTradingVolume", value=j["10DayAverageTradingVolume"], inline=False)
+    embed.add_field(name="26WeekPriceReturnDaily", value=j["26WeekPriceReturnDaily"], inline=False)
+    embed.add_field(name="3MonthAverageTradingVolume", value=j["3MonthAverageTradingVolume"], inline=False)
+    embed.add_field(name="52WeekHigh", value=j["52WeekHigh"], inline=False)
+    embed.add_field(name="52WeekHighDate", value=j["52WeekHighDate"], inline=False)
+    
+    embed.add_field(name="52WeekPriceReturnDaily", value=j["52WeekPriceReturnDaily"], inline=False)
+    
+    embed.add_field(name="assetTurnoverAnnual", value=j["assetTurnoverAnnual"], inline=False)
+    
+    embed.add_field(name="beta", value=j["beta"], inline=False)
+    
+    embed.add_field(name="bookValuePerShareAnnual", value=j["bookValuePerShareAnnual"], inline=False)
+    
+    embed.add_field(name="bookValuePerShareQuarterly", value=j["bookValuePerShareQuarterly"], inline=False)
+    
+    embed.add_field(name="cashFlowPerShareAnnual", value=j["cashFlowPerShareAnnual"], inline=False)
+    
+    embed.add_field(name="cashPerSharePerShareAnnual", value=j["cashPerSharePerShareAnnual"], inline=False)
+
+    
+    embed.add_field(name="currentEv/freeCashFlowAnnual", value=j["currentEv/freeCashFlowAnnual"], inline=False)
+    
+    embed.add_field(name="currentRatioAnnual", value=j["currentRatioAnnual"], inline=False)
+    
+    embed.add_field(name="dilutedEpsExclExtraTTM", value=j["dilutedEpsExclExtraTTM"], inline=False)
+    
+    embed.add_field(name="dividendPerShareAnnual", value=j["dividendPerShareAnnual"], inline=False)
+    
+    embed.add_field(name="dividendYield5Y", value=j["dividendYield5Y"], inline=False)
+    
+    embed.add_field(name="freeCashFlowAnnual", value=j["freeCashFlowAnnual"], inline=False)
+    
+    embed.add_field(name="grossMargin5Y", value=j["grossMargin5Y"], inline=False)
+    
+    embed.add_field(name="inventoryTurnoverAnnual", value=j["inventoryTurnoverAnnual"], inline=False)
+    
+    embed.add_field(name="netDebtAnnual", value=j["netDebtAnnual"], inline=False)
+    
+    embed.add_field(name="netIncomeCommonAnnual", value=j["netIncomeCommonAnnual"], inline=False)
+    
+    embed.add_field(name="netIncomeCommonNormalizedAnnual", value=j["netIncomeCommonNormalizedAnnual"], inline=False)
+    
+    embed.add_field(name="netInterestCoverageAnnual", value=j["netInterestCoverageAnnual"], inline=False)
+    
+    embed.add_field(name="netMarginGrowth5Y", value=j["netMarginGrowth5Y"], inline=False)
+    
+    embed.add_field(name="operatingMarginAnnual", value=j["operatingMarginAnnual"], inline=False)
+    
+    embed.add_field(name="revenueAnnual", value=j["revenueAnnual"], inline=False)
+    
+    embed.add_field(name="revenueEmployeeAnnual", value=j["revenueEmployeeAnnual"], inline=False)
+    
+    embed.add_field(name="revenueGrowth3Y", value=j["revenueGrowth3Y"], inline=False)
+    
+    embed.add_field(name="revenueGrowth5Y", value=j["revenueGrowth5Y"], inline=False)
+    
+    embed.add_field(name="revenueGrowthQuarterlyYoy", value=j["revenueGrowthQuarterlyYoy"], inline=False)
+    
+    embed.add_field(name="totalDebt/totalEquityAnnual", value=j["totalDebt/totalEquityAnnual"], inline=False)
+    
+    embed.add_field(name="yearToDatePriceReturnDaily", value=j["yearToDatePriceReturnDaily"], inline=False)
+    embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+    await ctx.send(embed=embed)
+
+
+@bot.command()
+async def AnylastData(ctx, stocksymbol: str):
+    r = requests.get('https://finnhub.io/api/v1/stock/recommendation?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
+    e=r.json()
+    j = e[0]
+    embed=discord.Embed(title=j["symbol"], description="Analyst Recommendation",color=0x5C5D7F)
+    embed.set_author(name="Synapse", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+    embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+    embed.add_field(name="Buy", value=j["buy"], inline=False)
+    embed.add_field(name="Hold", value=j["hold"], inline=False)
+    embed.add_field(name="Period", value=j["period"], inline=False)
+    embed.add_field(name="Sell", value=j["sell"], inline=False)
+    embed.add_field(name="Strong Buy", value=j["strongBuy"], inline=False)
+    embed.add_field(name="Strong Sell", value=j["strongSell"], inline=False)
+    embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+    await ctx.send(embed=embed)
+
 
 
 @bot.command()
