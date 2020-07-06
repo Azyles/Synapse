@@ -69,6 +69,24 @@ async def on_ready():
     print('status set to online')
     print(bot.user.id)
     print('--------------------')
+    br = str(600)
+    global massPing
+    if br == "break":
+        massPing= False
+    else:
+        massPing = True
+        while massPing:
+            x=0
+            y= int(100) 
+            i = int(600)
+            while x < y:
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                print(current_time)
+                await asyncio.sleep(i)
+                x = x+1
+                if massPing == False:
+                    x=y + 1
 
 
 @bot.command()
@@ -102,7 +120,6 @@ async def pinger(ctx, interval, times):
                 channel = bot.get_channel(728315394040791061)
                 now = datetime.now()
                 current_time = now.strftime("%H:%M:%S")
-                await channel.send(current_time)
                 print(current_time)
                 await asyncio.sleep(i)
                 x = x+1
