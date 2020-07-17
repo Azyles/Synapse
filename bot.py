@@ -666,4 +666,4 @@ async def About(ctx):
   await ctx.send(embed=embed)
   
 keep_alive()
-bot.run('NzEyNTE1NTMyNjgyOTUyNzM1.Xsb8tg.eUjv-ebWkfhtCVANv0t1uyv5ILw')
+bot.run('')
