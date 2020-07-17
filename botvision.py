@@ -38,7 +38,7 @@ import requests, json
 covid = Covid(source="worldometers")
 
 city_name = 'Monterey'
-api_key = "549b0eaf0ba1e27619cf96fb0ba32a1b"
+api_key = ""
 base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
 description = '''Advanced Stock Analysis Bot'''
@@ -761,4 +761,4 @@ async def About(ctx):
   await ctx.send(embed=embed)
 
 keep_alive()
-bot.run('NzEzNDczMTE5MTc1ODM1NzU5.Xvzrpw.1B5dlreGZzUBCYCcecAhmW7X71U')
+bot.run('')
