@@ -49,6 +49,7 @@ activeactivity = [
     'Predicting Stock Prices'
 ]
 
+# Add Themes Soon
 graphcolor = ['Cyan']
 
 plt.style.use('dark_background')
@@ -65,6 +66,7 @@ async def on_ready():
     print(bot.user.id)
     print('--------------------')
     br = str(600)
+    # This is just so I know when the bot went offline
     global massPing
     if br == "break":
         massPing= False
