@@ -1,33 +1,37 @@
 # Synapse
-Discord bot
+
 Website: https://synapsebot.netlify.app/
+
+Support Server: https://discord.gg/YacXTzr
+
+Dev: **Kushagra #7596** (feel free to contact me if you have any questions)
 
 ## Commands
 ##### Basic Data
-X Stock (Ticker)
+`X Stock (Ticker)`
 ##### Advanced Data
-X AdvancedData (Ticker)
+`X AdvancedData (Ticker)`
 ##### Graph
-X Graph (Ticker)
+`X Graph (Ticker)`
 ##### Custom Graph
-X CGraph (days) (Ticker)
+`X CGraph (days) (Ticker)`
 ##### Company Data
-X Company (Ticker)
+`X Company (Ticker)`
 ##### Crypto Info
-X Crypto (Ticker)
+`X Crypto (Ticker)`
 ##### Return
-X Return (Ticker)
+`X Return (Ticker)`
 ##### Unformatted Data
-X Data (Ticker)
+`X Data (Ticker)`
 ##### Weather
-X Weather (City)
+`X Weather (City)`
 
 ## Sim Commands
 ##### Start Game (10k)
-X Start
+`X Start`
 ##### Buy Stock
-X Buy (Ticker) (Amount)
+`X Buy (Ticker) (Amount)`
 ##### Sell Stock
-X Sell (Ticker) (Amount)
+`X Sell (Ticker) (Amount)`
 ##### Portfolio
-X Portfolio
+`X Portfolio`
