@@ -70,6 +70,7 @@ async def on_ready():
     print(bot.user.id)
     print('--------------------')
     br = str(600)
+    # This is just so I know when the bot went offline
     global massPing
     if br == "break":
         massPing= False
@@ -101,31 +102,6 @@ async def a(ctx, *message):
     channel = bot.get_channel(699328249154633768)
     text = ' '.join(message)
     await channel.send(text)
-
-
-@bot.command()
-async def pinger(ctx, interval, times):
-    br = str(interval)
-    global massPing
-    if br == "break":
-        massPing= False
-        await ctx.send("Mass ping broken")
-    else:
-        massPing = True
-        while massPing:
-            x=0
-            y= int(times) 
-            i = int(interval)
-            while x < y:
-                channel = bot.get_channel(728315394040791061)
-                now = datetime.now()
-                current_time = now.strftime("%H:%M:%S")
-                print(current_time)
-                await asyncio.sleep(i)
-                x = x+1
-                if massPing == False:
-                    x=y + 1
-
 
 @bot.command()
 async def Graph(ctx, *stocksymbol):
