@@ -75,7 +75,9 @@ Synapse Vision is currently still a work in progress.
 
 
 ## Versions
-Synapse Vision is currently still a work in progress.
 
-##### V0.9 Pre-Release
+##### Synapse V0.9 Pre-Release
 https://discord.com/oauth2/authorize?client_id=712515532682952735&permissions=457792&scope=bot
+
+##### Synapse Vision Beta
+Coming Soon
