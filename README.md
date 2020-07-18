@@ -42,7 +42,7 @@ This command will graph return in not one but three awesome graphs. Sounds like 
 Why anyone would use this command is beyond me but if you want unformatted data I guess this command is for you.
 
 `X Data (Ticker)`
-##### Weather
+##### Weather 
 Stay Inside!
 
 `X Weather (City)`
@@ -81,3 +81,37 @@ https://discord.com/oauth2/authorize?client_id=712515532682952735&permissions=45
 
 ##### Synapse Vision Beta
 Coming Soon
+
+
+## Upcoming Features
+
+##### Synapse
+- Improved Embeds
+- New Fun Commands
+- Error Messages
+- Logs
+
+##### Synapse Vision Beta
+- Color Themes
+- Format Prediction Output
+- Prediction Graphs
+- Error Messages
+- Logs
+
+
+## Known Bugs
+
+##### Synapse
+- Graphs
+  - Graphs may take longer than normal
+  - Graphs colors may be glitched
+
+##### Synapse Vision Beta
+- Graphs
+  - Graphs may take longer than normal
+  - Graphs colors may be glitched
+- Prediction
+  - Output is unformatted
+
+
+
