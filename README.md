@@ -53,6 +53,13 @@ Stay Inside!
 
 `X Weather (City)`
 
+##### Help 
+This will send you a list of commands
+
+`X help`
+
+
+
 ## Simulation Commands
 Build your portfolio and react to the markets in real time with Synapse Sim. You start of with $10000 of virtual money and can invest it with real-time pricing. Synapse Sim comes with all the fun and excitment of investing without the risk. (note. This is strictly a simulation)
 
