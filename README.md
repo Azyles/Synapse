@@ -9,6 +9,12 @@ Support Server: https://discord.gg/YacXTzr
 
 Dev: **Kushagra #7596** (feel free to contact me if you have any questions)
 
+Example Tickers:
+  - TSLA
+  - AAPL
+  - RACE
+  - DAL
+
 ## Commands
 ##### Basic Data
 Want information about a specific stock? The following command will use a secure API to gather information on the specific ticker and send you the data in a clear, easy to read, way. 
@@ -102,6 +108,8 @@ Coming Soon
 ## Known Bugs
 
 ##### Synapse
+- Error Message
+  - Only working on 2 commands
 - Graphs
   - Graphs may take longer than normal
   - Graphs colors may be glitched
