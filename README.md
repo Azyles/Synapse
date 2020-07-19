@@ -7,7 +7,7 @@ Website: https://synapsebot.netlify.app/
 
 Support Server: https://discord.gg/YacXTzr
 
-Dev: **Kushagra #7596** (feel free to contact me if you have any questions)
+Dev: **S🅱INALLA #7596** (feel free to contact me if you have any questions)
 
 Example Tickers:
   - TSLA
