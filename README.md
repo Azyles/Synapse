@@ -25,7 +25,7 @@ Example Tickers:
 
 ## Commands
 ##### Basic Data
-Want information about a specific stock? The following command will use a secure API to gather information on the specific ticker and send you the data in a clear, easy to read, way. 
+Want information about a specific stock? The following command will use a secure API to gather information on the specific ticker and send you the data in a clear, easy to read, way. `X Help`
 
 `X Stock (Ticker)`
 ##### Advanced Data
