@@ -1,24 +1,23 @@
-import asyncio
-import random
 import os
+from keep_alive import keep_alive
 import discord
 from discord.ext import commands
-from keep_alive import keep_alive
-
+import asyncio
+import random
+import platform
 from datetime import datetime
 
-
+import time
 #SynapseInvestor
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 cred = credentials.Certificate('SynapseBot-02ec52c4b1b0.json')
 firebase_admin.initialize_app(cred, {
-  'projectId': "synapsebot-fb65a",
+    'projectId': "synapsebot-fb65a",
 })
 
 db = firestore.client()
-
 
 #StockPrice Imports
 import pandas as pd
@@ -32,76 +31,48 @@ import matplotlib.ticker as ticker
 
 #Specific
 from yahoo_fin import stock_info as si
-#Covid
-from covid import Covid
 import requests, json
 
-covid = Covid(source="worldometers")
+import platform
 
 city_name = 'Monterey'
-api_key = ""
+api_key = "549b0eaf0ba1e27619cf96fb0ba32a1b"
 base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
-description = '''Advanced Stock Analysis Bot'''
-
-bot = commands.Bot('X ', description=description)
-
-activeactivity = [
-    'Analyzing Market...'
-]
+activeactivity = ['Analyzing Market...']
 
 randomthing = [
-    'Synapse','','Synapse','Synapse',
+    'Synapse',
 ]
 
-graphcolor = ['Cyan']
+graphcolor = ['Pink']
 
 plt.style.use('dark_background')
 
+bot = commands.Bot(
+	command_prefix="X ",  # Change to desired prefix
+	case_insensitive=True,  # Commands aren't case-sensitive
+  description='Advanced Stock Analysis Bot'
+)
 
-@bot.event
-async def on_ready():
-    await bot.change_presence(
-        activity=discord.Activity(
-            type=discord.ActivityType.playing,
-            name=random.choice(activeactivity)))
-    print(bot.user.name)
-    print('status set to online')
-    print(bot.user.id)
-    print('--------------------')
-    br = str(600)
-    # This is just so I know when the bot went offline
-    global massPing
-    if br == "break":
-        massPing= False
-    else:
-        massPing = True
-        while massPing:
-            x=0
-            y= int(100) 
-            i = int(600)
-            while x < y:
-                now = datetime.now()
-                current_time = now.strftime("%H:%M:%S")
-                print(current_time)
-                await asyncio.sleep(i)
-                x = x+1
-                if massPing == False:
-                    x=y + 1
+bot.remove_command('help')
 
+bot.author_id = 408753256014282762  # Change to your discord id!!!
+
+
+start = time.time()
+
+@bot.event 
+async def on_ready():  # When the bot is ready
+    print("I'm in")
+    print(bot.user)  # Prints the bot's username and identifier
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name='X Help'))
 
 @bot.command()
-async def ping(ctx):
+async def Ping(ctx):
     ping = round(bot.latency * 1000)
     print(ping)
     await ctx.send(f"The ping of this bot is {ping} ms")
-
-
-@bot.command()
-async def a(ctx, *message):
-    channel = bot.get_channel(699328249154633768)
-    text = ' '.join(message)
-    await channel.send(text)
 
 @bot.command()
 async def Graph(ctx, *stocksymbol):
@@ -139,48 +110,318 @@ async def CGraph(ctx, stocksymbol, range: int):
 
 
 @bot.command()
+async def AdvancedData(ctx, stocksymbol: str):
+    r = requests.get('https://finnhub.io/api/v1/stock/metric?symbol=' +
+                     stocksymbol + '&metric=all&token=bre3nkfrh5rckh454te0')
+    e = r.json()
+    j = e['metric']
+    if "error" in e:
+      await ctx.send('Ticker does not exist')
+    embed = discord.Embed(
+        title=e['symbol'], description="Stock Analysis", color=0x5C5D7F)
+    embed.set_author(
+        name="Synapse",
+        url="https://synapsebot.netlify.app",
+        icon_url=
+        "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+    )
+    embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+    try:
+      embed.add_field(
+        name="10DayAverageTradingVolume",
+        value=j["10DayAverageTradingVolume"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="26WeekPriceReturnDaily",
+        value=j["26WeekPriceReturnDaily"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="3MonthAverageTradingVolume",
+        value=j["3MonthAverageTradingVolume"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(name="52WeekHigh", value=j["52WeekHigh"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="52WeekHighDate", value=j["52WeekHighDate"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="52WeekPriceReturnDaily",
+        value=j["52WeekPriceReturnDaily"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="assetTurnoverAnnual",
+        value=j["assetTurnoverAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(name="beta", value=j["beta"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="bookValuePerShareAnnual",
+        value=j["bookValuePerShareAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="bookValuePerShareQuarterly",
+        value=j["bookValuePerShareQuarterly"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="cashFlowPerShareAnnual",
+        value=j["cashFlowPerShareAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="cashPerSharePerShareAnnual",
+        value=j["cashPerSharePerShareAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="currentEv/freeCashFlowAnnual",
+        value=j["currentEv/freeCashFlowAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="currentRatioAnnual", value=j["currentRatioAnnual"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="dividendPerShareAnnual",
+        value=j["dividendPerShareAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="dividendYield5Y", value=j["dividendYield5Y"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="freeCashFlowAnnual", value=j["freeCashFlowAnnual"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="grossMargin5Y", value=j["grossMargin5Y"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="inventoryTurnoverAnnual",
+        value=j["inventoryTurnoverAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="netDebtAnnual", value=j["netDebtAnnual"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="netIncomeCommonNormalizedAnnual",
+        value=j["netIncomeCommonNormalizedAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="netInterestCoverageAnnual",
+        value=j["netInterestCoverageAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="netMarginGrowth5Y", value=j["netMarginGrowth5Y"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="operatingMarginAnnual",
+        value=j["operatingMarginAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="revenueAnnual", value=j["revenueAnnual"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="revenueEmployeeAnnual",
+        value=j["revenueEmployeeAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="revenueGrowth3Y", value=j["revenueGrowth3Y"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="revenueGrowth5Y", value=j["revenueGrowth5Y"], inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="revenueGrowthQuarterlyYoy",
+        value=j["revenueGrowthQuarterlyYoy"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="totalDebt/totalEquityAnnual",
+        value=j["totalDebt/totalEquityAnnual"],
+        inline=False)
+    except:
+      pass
+    try:
+      embed.add_field(
+        name="yearToDatePriceReturnDaily",
+        value=j["yearToDatePriceReturnDaily"],
+        inline=False)
+    except:
+      pass
+    embed.set_footer(text="Synapse Bot")
+    await ctx.send(embed=embed)
+
+
+@bot.command()
+async def AnylastData(ctx, stocksymbol: str):
+    r = requests.get('https://finnhub.io/api/v1/stock/recommendation?symbol=' +
+                     stocksymbol + '&token=bre3nkfrh5rckh454te0')
+    e = r.json()
+    j = e[0]
+    if "[]" in e:
+      await ctx.send('Ticker does not exist')
+    embed = discord.Embed(
+        title=j["symbol"],
+        description="Analyst Recommendation",
+        color=0x5C5D7F)
+    embed.set_author(
+        name="Synapse",
+        url="https://synapsebot.netlify.app",
+        icon_url=
+        "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+    )
+    embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+    embed.add_field(name="Buy", value=j["buy"], inline=False)
+    embed.add_field(name="Hold", value=j["hold"], inline=False)
+    embed.add_field(name="Period", value=j["period"], inline=False)
+    embed.add_field(name="Sell", value=j["sell"], inline=False)
+    embed.add_field(name="Strong Buy", value=j["strongBuy"], inline=False)
+    embed.add_field(name="Strong Sell", value=j["strongSell"], inline=False)
+    embed.set_footer(text="Synapse Bot")
+    await ctx.send(embed=embed)
+
+
+@bot.command()
 async def Analysis(ctx, stocksymbol: str):
-    r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
-    j=r.json()
-    embed=discord.Embed(title="About", description="Stock Analysis",color=0x5C5D7F)
-    embed.set_author(name="Synapse", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + stocksymbol +
+                     '&token=bre3nkfrh5rckh454te0')
+    j = r.json()
+    if "error" in j:
+      await ctx.send('Ticker does not exist')
+    embed = discord.Embed(
+        title="About", description="Stock Analysis", color=0x5C5D7F)
+    embed.set_author(
+        name="Synapse",
+        url="https://synapsebot.netlify.app",
+        icon_url=
+        "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+    )
     embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
     embed.add_field(name="Current Price", value=j["c"], inline=False)
     embed.add_field(name="Open Price", value=j["o"], inline=False)
     embed.add_field(name="High Price", value=j["h"], inline=False)
     embed.add_field(name="Low Price", value=j["l"], inline=False)
     embed.add_field(name="Previous Close Price", value=j["pc"], inline=False)
-    embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+    embed.set_footer(text="Synapse Bot")
     await ctx.send(embed=embed)
 
 
 @bot.command()
 async def Stock(ctx, stocksymbol: str):
-    r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
-    j=r.json()
-    embed=discord.Embed(title="About", description="Stock Analysis",color=0x5C5D7F)
-    embed.set_author(name="Synapse", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + stocksymbol +
+                     '&token=bre3nkfrh5rckh454te0')
+    j = r.json()
+    if "error" in j:
+      await ctx.send(j['error'])
+    embed = discord.Embed(
+        title="About", description="Stock Analysis", color=0x5C5D7F)
+    embed.set_author(
+        name="Synapse",
+        url="https://synapsebot.netlify.app",
+        icon_url=
+        "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+    )
     embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
     embed.add_field(name="Current Price", value=j["c"], inline=False)
     embed.add_field(name="Open Price", value=j["o"], inline=False)
     embed.add_field(name="High Price", value=j["h"], inline=False)
     embed.add_field(name="Low Price", value=j["l"], inline=False)
     embed.add_field(name="Previous Close Price", value=j["pc"], inline=False)
-    embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+    embed.set_footer(text="Synapse Bot")
     await ctx.send(embed=embed)
 
 
 @bot.command()
 async def Company(ctx, stocksymbol: str):
-    r = requests.get('https://finnhub.io/api/v1/stock/profile2?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
-    j=r.json()
-    embed=discord.Embed(title=j["name"], description="Stock Analysis",color=0x5C5D7F)
-    embed.set_author(name="SynapseBot", url="https://github.com/KingRegera", icon_url="https://i.imgur.com/WkqngoQ.png")
+    r = requests.get('https://finnhub.io/api/v1/stock/profile2?symbol=' +
+                     stocksymbol + '&token=bre3nkfrh5rckh454te0')
+    j = r.json()
+    if "{}" in j:
+      await ctx.send('Ticker does not exist')
+    
+    embed = discord.Embed(
+        title=j["name"], description="Stock Analysis", color=0x5C5D7F)
+    embed.set_author(
+        name="SynapseBot",
+        url="https://synapsebot.netlify.app",
+        icon_url="https://i.imgur.com/WkqngoQ.png")
     embed.set_thumbnail(url=j["logo"])
     embed.add_field(name="Country", value=j["country"], inline=False)
     embed.add_field(name="exchange", value=j["exchange"], inline=False)
     embed.add_field(name="Name", value=j["name"], inline=False)
-    embed.add_field(name="marketCapitalization", value=j["marketCapitalization"], inline=False)
+    embed.add_field(
+        name="marketCapitalization",
+        value=j["marketCapitalization"],
+        inline=False)
     embed.add_field(name="Industry", value=j["finnhubIndustry"], inline=False)
     embed.set_footer(text=j["weburl"])
     await ctx.send(embed=embed)
@@ -188,26 +429,49 @@ async def Company(ctx, stocksymbol: str):
 
 @bot.command()
 async def Crypto(ctx, stocksymbol: str):
-    r = requests.get('https://www.alphavantage.co/query?function=CRYPTO_RATING&symbol='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
-    f=r.json()
+    r = requests.get(
+        'https://www.alphavantage.co/query?function=CRYPTO_RATING&symbol=' +
+        stocksymbol + '&apikey=QWOU4B1BS6VHRKOF')
+    f = r.json()
+    if "Error Message" in f:
+      await ctx.send(f['Error Message'])
+    
     j = f['Crypto Rating (FCAS)']
-    a = requests.get('https://api.nomics.com/v1/currencies/ticker?key=9cfc5a1350155356f898ab4ecca3764e&ids=BTC')
-    b=a.json()
-    embed=discord.Embed(title=j["2. name"], description="Crypto Rating",color=0x5C5D7F)
-    embed.set_author(name="SynapseBot", url="https://github.com/KingRegera", icon_url="https://i.imgur.com/WkqngoQ.png")
+    a = requests.get(
+        'https://api.nomics.com/v1/currencies/ticker?key=9cfc5a1350155356f898ab4ecca3764e&ids=BTC'
+    )
+    b = a.json()
+    embed = discord.Embed(
+        title=j["2. name"], description="Crypto Rating", color=0x5C5D7F)
+    embed.set_author(
+        name="SynapseBot",
+        url="https://synapsebot.netlify.app",
+        icon_url="https://i.imgur.com/WkqngoQ.png")
     embed.set_thumbnail(url="https://i.imgur.com/SYIs6VF.jpg")
     embed.add_field(name="Symbol", value=j["1. symbol"], inline=False)
     embed.add_field(name="Value", value=str(b["price"]), inline=False)
     embed.add_field(name="Rank", value=str(b["rank"]), inline=False)
-    embed.add_field(name="Circulating Supply", value=str(b["circulating_supply"]), inline=False)
-    embed.add_field(name="Max Supply", value=str(b["max_supply"]), inline=False)
-    embed.add_field(name="Market Cap", value=str(b["market_cap"]), inline=False)
-    embed.add_field(name="Fcas Rating", value=j["3. fcas rating"], inline=False)
+    embed.add_field(
+        name="Circulating Supply",
+        value=str(b["circulating_supply"]),
+        inline=False)
+    embed.add_field(
+        name="Max Supply", value=str(b["max_supply"]), inline=False)
+    embed.add_field(
+        name="Market Cap", value=str(b["market_cap"]), inline=False)
+    embed.add_field(
+        name="Fcas Rating", value=j["3. fcas rating"], inline=False)
     embed.add_field(name="Fcas score", value=j["4. fcas score"], inline=False)
-    embed.add_field(name="Developer Score", value=j["5. developer score"], inline=False)
-    embed.add_field(name="Market Maturity Score", value=j["6. market maturity score"], inline=False)
-    embed.add_field(name="Utility Score", value=j["7. utility score"], inline=False)
-    embed.add_field(name="Last Refreshed", value=j["8. last refreshed"], inline=False)
+    embed.add_field(
+        name="Developer Score", value=j["5. developer score"], inline=False)
+    embed.add_field(
+        name="Market Maturity Score",
+        value=j["6. market maturity score"],
+        inline=False)
+    embed.add_field(
+        name="Utility Score", value=j["7. utility score"], inline=False)
+    embed.add_field(
+        name="Last Refreshed", value=j["8. last refreshed"], inline=False)
     embed.add_field(name="Timezone", value=j["9. timezone"], inline=False)
     embed.set_footer(text=j["2. name"])
     await ctx.send(embed=embed)
@@ -340,82 +604,105 @@ async def Data(ctx, stocksymbol, days=0):
 
 @bot.command()
 async def Start(ctx):
-    doc_ref = db.collection(str(ctx.author.id)).document(u'UserData') 
+    doc_ref = db.collection(str(ctx.author.id)).document(u'UserData')
     doc_ref.set({
         u'Name': ctx.author.name,
         u'Tier': 1,
         u'Cash': 10000,
     })
+    await ctx.send(f'Your Account has been created {ctx.author.name}')
+
 
 @bot.command()
 async def Portfolio(ctx):
     users_ref = db.collection(str(ctx.author.id))
     docs = users_ref.stream()
+    await ctx.send('Loading Portfolio...')
+    await asyncio.sleep(1)
+    await ctx.channel.purge(limit=1)
     for doc in docs:
         if doc == "UserData":
             print("Ignore")
         else:
             stock = doc.id
-            r = requests.get('https://finnhub.io/api/v1/quote?symbol='+str(stock)+'&token=bre3nkfrh5rckh454te0')
-            j=r.json()
+            r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
+                             str(stock) + '&token=bre3nkfrh5rckh454te0')
+            j = r.json()
             sharevalue = j['c']
-            refrence = db.collection(str(ctx.author.id)).document(str(stock)) 
+            refrence = db.collection(str(ctx.author.id)).document(str(stock))
             cash = refrence.get({u'Shares'})
             value = u'{}'.format(cash.to_dict()['Shares'])
             sharecashvalue = float(sharevalue) * float(value)
             await ctx.send(f'{doc.id}: {str(sharecashvalue)}')
 
 
-
 @bot.command()
 async def Sell(ctx, stocksymbol, amount: int):
-    doc_ref = db.collection(str(ctx.author.id)).document(u'UserData') 
+    doc_ref = db.collection(str(ctx.author.id)).document(u'UserData')
     doc = doc_ref.get()
     docs = doc_ref.get({u'Cash'})
     bal = u'{}'.format(docs.to_dict()['Cash'])
     if doc.exists:
-        doc_refren = db.collection(str(ctx.author.id)).document(str(stocksymbol)) 
+        doc_refren = db.collection(str(ctx.author.id)).document(
+            str(stocksymbol))
         stockown = doc_refren.get()
         if stockown.exists:
-            r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
-            j=r.json()
+            r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
+                             stocksymbol + '&token=bre3nkfrh5rckh454te0')
+            j = r.json()
+            if "error" in j:
+              await ctx.send('Ticker does not exist')
+    
             sharevalue = j['c']
             shareown = doc_refren.get({u'Shares'})
             shareowned = u'{}'.format(shareown.to_dict()['Shares'])
             print(float(shareowned))
-            sharestocash = float(shareowned)*sharevalue
+            sharestocash = float(shareowned) * sharevalue
             print(sharestocash)
             if int(sharestocash) >= amount:
-                sharesselling = amount/sharevalue
+                sharesselling = amount / sharevalue
                 print(sharesselling)
                 newownedshares = float(shareowned) - sharesselling
                 print(newownedshares)
                 newbalance = int(bal) + amount
                 print(newbalance)
-                doc_refr = db.collection(str(ctx.author.id)).document(str(stocksymbol))
+                doc_refr = db.collection(str(ctx.author.id)).document(
+                    str(stocksymbol))
                 doc_refr.set({
                     u'Shares': newownedshares,
                 })
-                doc_refm = db.collection(str(ctx.author.id)).document("UserData")
+                doc_refm = db.collection(str(
+                    ctx.author.id)).document("UserData")
                 doc_refm.set({
                     u'Cash': newbalance,
                 }, merge=True)
-                embed=discord.Embed(title="Sell Successful", description="Successfully sold stocks",color=0x5C5D7F)
-                embed.set_author(name="Synapse Xsim", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+                embed = discord.Embed(
+                    title="Sell Successful",
+                    description="Successfully sold stocks",
+                    color=0x5C5D7F)
+                embed.set_author(
+                    name="Synapse Xsim",
+                    url="https://synapsebot.netlify.app",
+                    icon_url=
+                    "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+                )
                 embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
                 embed.add_field(name="Sell Price", value=j["c"], inline=False)
-                embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
-                await ctx.send(embed=embed) 
+                embed.set_footer(
+                    text="Synapse Bot")
+                await ctx.send(embed=embed)
             else:
                 await ctx.send("`Sell excedes owned value`")
         else:
             await ctx.send("`No shares to sell`")
     else:
-        await ctx.send("User not found, please do the following command `X Start`")
+        await ctx.send(
+            "User not found, please do the following command `X Start`")
+
 
 @bot.command()
 async def Buy(ctx, stocksymbol, amount: int):
-    doc_ref = db.collection(str(ctx.author.id)).document(u'UserData') 
+    doc_ref = db.collection(str(ctx.author.id)).document(u'UserData')
     doc = doc_ref.get()
     if doc.exists:
         docs = doc_ref.get({u'Cash'})
@@ -423,223 +710,258 @@ async def Buy(ctx, stocksymbol, amount: int):
         if int(bal) < amount:
             await ctx.send("Purchase exceds balance")
         else:
-            check_share = db.collection(str(ctx.author.id)).document(str(stocksymbol))
+            check_share = db.collection(str(ctx.author.id)).document(
+                str(stocksymbol))
             share_check = check_share.get()
             if share_check.exists:
-                r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
-                j=r.json()
+                r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
+                                 stocksymbol + '&token=bre3nkfrh5rckh454te0')
+                j = r.json()
+                if "error" in j:
+                  await ctx.send('Ticker does not exist')
+    
                 sharevalue = j['c']
-                getsharesc = db.collection(str(ctx.author.id)).document(str(stocksymbol)) 
+                getsharesc = db.collection(str(ctx.author.id)).document(
+                    str(stocksymbol))
                 docs = getsharesc.get({u'Shares'})
                 ownshares = u'{}'.format(docs.to_dict()['Shares'])
-                sharesbought = amount/sharevalue
+                sharesbought = amount / sharevalue
                 ownshares = int(float(ownshares)) + sharesbought
                 newbalance = int(bal) - amount
-                doc_refr = db.collection(str(ctx.author.id)).document(str(stocksymbol))
+                doc_refr = db.collection(str(ctx.author.id)).document(
+                    str(stocksymbol))
                 doc_refr.set({
                     u'Shares': ownshares,
                 })
-                doc_refm = db.collection(str(ctx.author.id)).document("UserData")
+                doc_refm = db.collection(str(
+                    ctx.author.id)).document("UserData")
                 doc_refm.set({
                     u'Cash': newbalance,
                 }, merge=True)
-                embed=discord.Embed(title="Purchase Successful", description="Successfully purchased stocks",color=0x5C5D7F)
-                embed.set_author(name="Synapse Xsim", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+                embed = discord.Embed(
+                    title="Purchase Successful",
+                    description="Successfully purchased stocks",
+                    color=0x5C5D7F)
+                embed.set_author(
+                    name="Synapse Xsim",
+                    url="https://synapsebot.netlify.app",
+                    icon_url=
+                    "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+                )
                 embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
-                embed.add_field(name="Shares Bought", value=sharesbought, inline=False)
+                embed.add_field(
+                    name="Shares Bought", value=sharesbought, inline=False)
                 embed.add_field(name="Buy Price", value=j["c"], inline=False)
-                embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
-                await ctx.send(embed=embed)   
+                embed.set_footer(
+                    text="Synapse Bot")
+                await ctx.send(embed=embed)
             else:
-                r = requests.get('https://finnhub.io/api/v1/quote?symbol='+stocksymbol+'&token=bre3nkfrh5rckh454te0')
-                j=r.json()
+                r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
+                                 stocksymbol + '&token=bre3nkfrh5rckh454te0')
+                j = r.json()
+                if "error" in j:
+                  await ctx.send('Ticker does not exist')
+    
                 sharevalue = j['c']
-                sharesbought = amount/sharevalue
+                sharesbought = amount / sharevalue
                 newbalance = int(bal) - amount
-                doc_refr = db.collection(str(ctx.author.id)).document(str(stocksymbol))
+                doc_refr = db.collection(str(ctx.author.id)).document(
+                    str(stocksymbol))
                 doc_refr.set({
                     u'Shares': sharesbought,
                 })
-                doc_refm = db.collection(str(ctx.author.id)).document("UserData")
+                doc_refm = db.collection(str(
+                    ctx.author.id)).document("UserData")
                 doc_refm.set({
                     u'Cash': newbalance,
                 }, merge=True)
-                embed=discord.Embed(title="Purchase Successful", description="Successfully purchased stocks",color=0x5C5D7F)
-                embed.set_author(name="Synapse Xsim", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
+                embed = discord.Embed(
+                    title="Purchase Successful",
+                    description="Successfully purchased stocks",
+                    color=0x5C5D7F)
+                embed.set_author(
+                    name="Synapse Xsim",
+                    url="https://synapsebot.netlify.app",
+                    icon_url=
+                    "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+                )
                 embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
                 embed.add_field(name="Buy Price", value=j["c"], inline=False)
-                embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
-                await ctx.send(embed=embed)   
+                embed.set_footer(
+                    text="Synapse Bot")
+                await ctx.send(embed=embed)
     else:
         ctx.send("User not found, please do the following command `X Start`")
+
 
 @bot.command()
 async def Weather(ctx, *, City):
     complete_url = base_url + "appid=" + api_key + "&q=" + City
     response = requests.get(complete_url)
     x = response.json()
-    if x["cod"] != "404":
-        y = x["main"]
-        current_temperature = y["temp"]
-        current_pressure = y["pressure"]
+    if x["cod"] != "404": 
+        y = x["main"] 
+        current_temperature = str(round(y["temp"]-273.15,2))
+        current_pressure = y["pressure"] 
         current_humidiy = y["humidity"]
-        z = x["weather"]
-        weather_description = z[0]["description"]
+        min_temp = format(round(y["temp_min"]-273.15,2))
+        max_temp = format(round(y["temp_max"]-273.15,2))
+        feels_like = format(round(y["feels_like"]-273.15,2))
+        z = x["weather"] 
+        icon = z[0]["icon"]
+        weather_description = z[0]["description"] 
+        weather_main = z[0]["main"] 
+        w = x["wind"]
+        wind = w["speed"]
+        wind_deg = w["deg"]
+
+        def faren(tem):
+          tem = float(tem)
+          return str(round(tem*9/5+32,2))
+
+        def degDir(d):
+          dirs = ['N', 'N/NE', 'NE', 'E/NE', 'E', 'E/SE', 'SE', 'S/SE', 'S', 'S/SW', 'SW', 'W/SW', 'W', 'W/NW', 'NW', 'N/NW']
+          ix = round(d / (360. / len(dirs)))
+          return dirs[ix % len(dirs)]
+
+
         embed = discord.Embed(
             title=City,
             description=
             "Synapse Weather gets information with the help of openweathermap.org",
             color=0x5C5D7F)
         embed.set_author(
-            name='Synapse', url="https://github.com/KingRegera/Synapse")
+            name='Synapse', url="https://synapsebot.netlify.app/Synapse")
         embed.set_thumbnail(url="https://i.imgur.com/Q66BhxI.png")
+
         embed.add_field(
             name="Temperature",
-            value=str(format(round(current_temperature - 273.15, 2))) + "°C",
-            inline=False)
-        faren = (current_temperature - 273.15) * 9 / 5 + 32
+            value= current_temperature + "°C - " + str(faren(current_temperature)) + "°F",
+            inline = False)
+        
         embed.add_field(
-            name="Temperature",
-            value=str(format(round(faren, 2))) + "°F",
-            inline=False)
-        embed.add_field(
-            name="atmospheric pressure",
-            value=str(current_pressure) + " hPa",
+            name="Feels Like",
+            value=feels_like + "°C - " + str(faren(feels_like)) + "°F",
             inline=False)
         embed.add_field(
-            name="humidity", value=str(current_humidiy) + "%", inline=False)
-        embed.add_field(
-            name="Synapse+ Description",
-            value=str(weather_description),
+            name="Minimum Temperature",
+            value=min_temp + "°C - " + str(faren(min_temp)) + "°F",
             inline=False)
+        
+        embed.add_field(
+            name="Maximum Temperature",
+            value=max_temp + "°C - " + str(faren(max_temp)) + "°F",
+            inline=False)
+
+        embed.add_field(
+            name="Wind",
+            value=str(wind) + " mph " + str(degDir(wind_deg)),inline=False)
+            
+        embed.add_field(
+            name="Humidity", value= str(current_humidiy) + "%", inline=False)
+
+        embed.add_field(
+            name="Atmospheric Pressure",
+            value= str(current_pressure) + " hPa",
+            inline=False)
+          
+        embed.add_field(
+            name="Description",
+            value=weather_description,inline=False)
+
         await ctx.send(embed=embed)
-    else:
+    else: 
         embed = discord.Embed(
             title="Error", description="City Not Found", color=0xFF8080)
         await ctx.send(embed=embed)
-
-
-@bot.command()
-async def CovidGraph(ctx):
-    df = pd.read_csv(
-        'https://raw.githubusercontent.com/datasets/covid-19/master/data/countries-aggregated.csv',
-        parse_dates=['Date'])
-    countries = [
-        'Canada', 'Germany', 'United Kingdom', 'US', 'France', 'China'
-    ]
-    df = df[df['Country'].isin(countries)]
-
-    # Section 3 - Creating a Summary Column
-    df['Cases'] = df[['Confirmed', 'Recovered', 'Deaths']].sum(axis=1)
-    df = df.pivot(index='Date', columns='Country', values='Cases')
-    countries = list(df.columns)
-    covid = df.reset_index('Date')
-    covid.set_index(['Date'], inplace=True)
-    covid.columns = countries
-
-    # Section 5 - Calculating Rates per 100,000
-    populations = {
-        'Canada': 37664517,
-        'Germany': 83721496,
-        'United Kingdom': 67802690,
-        'US': 330548815,
-        'France': 65239883,
-        'China': 1438027228
-    }
-    percapita = covid.copy()
-    for country in list(percapita.columns):
-        percapita[country] = percapita[country] / populations[country] * 100000
-    colors = {
-        'Canada': '#045275',
-        'China': '#089099',
-        'France': '#7CCBA2',
-        'Germany': '#FCDE9C',
-        'US': '#DC3977',
-        'United Kingdom': '#7C1D6F'
-    }
-    plt.style.use('fivethirtyeight')
-
-    # Section 7 - Creating the Visualization
-    plot = covid.plot(
-        figsize=(12, 8),
-        color=list(colors.values()),
-        linewidth=5,
-        legend=False)
-    plot.yaxis.set_major_formatter(ticker.StrMethodFormatter('{x:,.0f}'))
-    plot.grid(color='#d4d4d4')
-    plot.set_xlabel('Date')
-    plot.set_ylabel('# of Cases')
-
-    # Section 8 - Assigning Colour
-    for country in list(colors.keys()):
-        plot.text(
-            x=covid.index[-1],
-            y=covid[country].max(),
-            color=colors[country],
-            s=country,
-            weight='bold')
-
-    # Section 9 - Adding Labels
-    plot.text(
-        x=covid.index[1],
-        y=int(covid.max().max()) + 45000,
-        s="COVID-19 Cases by Country",
-        fontsize=23,
-        weight='bold',
-        alpha=.75)
-    plot.text(
-        x=covid.index[1],
-        y=int(covid.max().max()) + 15000,
-        s="",
-        fontsize=16,
-        alpha=.75)
-    plot.text(
-        x=percapita.index[1],
-        y=-100000,
-        s=
-        'datagy.io                      Source: https://github.com/datasets/covid-19/blob/master/data/countries-aggregated.csv',
-        fontsize=10)
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
-    await ctx.send(file=file)
-    os.remove("Images/Stock.png")
-
-
-@bot.command()
-async def Covid19(ctx, Country: str):
-    x = covid.get_status_by_country_name(Country)
-    await ctx.send(x)
-
-
-@bot.command()
-async def HostTest(ctx, Country: str):
-  print('----')
-  print('TEST')
-  print('----')
-
 
 @bot.command()
 async def Logo(ctx):
     await ctx.send('https://i.imgur.com/WkqngoQ.png')
 
+@bot.command()
+async def help(ctx):
+    embed = discord.Embed(
+        title="Synapse",
+        description=
+        "Synapse is a discord bot designed for all the business-minded users of discord. It provides an immense amount of information including, graphing and stock predictions. Synapse uses many different secure APIs to gather real-time information. To add on to the already diverse list of features Synapse also offers a simulation game in which you can build your own virtual portfolio risk-free!",
+        color=0x5C5D7F)
+    embed.set_author(
+        name="Synapse",
+        url="https://synapsebot.netlify.app/Synapse/blob/master/README.md",
+        icon_url=
+        "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+    )
+    embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+    
+    embed.add_field(name="Example Tickers", value="`TSLA` `AAPL` `RACE` `DAL`", inline=False)
+    embed.add_field(name="Stock Price", value="`X Stock (Ticker)`", inline=False)
+    embed.add_field(name="Advanced Data", value="`X AdvancedData (Ticker)`", inline=False)
+    embed.add_field(name="Advanced Data", value="`X AdvancedData (Ticker)`", inline=False)
+    embed.add_field(name="Graph", value="`X Graph (Ticker)`", inline=False)
+    embed.add_field(name="Custom Graph", value="`X CGraph (days) (Ticker)`", inline=False)
+    embed.add_field(name="Company Data", value="`X Company (Ticker`)", inline=False)
+    embed.add_field(name="Crypto Info", value="`X Crypto (Ticker)`", inline=False)
+    embed.add_field(name="Company Data", value="`X Company (Ticker)`", inline=False)
+    embed.add_field(name="Return", value="`X Return (Ticker)`", inline=False)
+    embed.add_field(name="Unformatted Data", value="`X Data (Ticker)`", inline=False)
+    embed.add_field(name="Weather", value="`X Company (Ticker)`", inline=False)
+    embed.add_field(name="Start Game (10k)", value="`X Start`", inline=False)
+    embed.add_field(name="Buy Stock", value="`X Buy (Ticker) (Amount)`", inline=False)
+    embed.add_field(name="Sell Stock", value="`X Sell (Ticker) (Amount)`", inline=False)
+    embed.add_field(name="Portfolio", value="`X Portfolio`", inline=False)
+    embed.add_field(name="Host Info", value="`X Host`", inline=False)
+    
+    embed.set_footer(text="Synapse Bot")
+    await ctx.send(embed=embed)
+
+
+@bot.event
+async def on_command_error(ctx, error):
+  if isinstance(error, commands.errors.CommandError):
+    print(error)
 
 @bot.command()
-async def About(ctx):
-  embed=discord.Embed(title="About", description="The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.",color=0x5C5D7F)
-  embed.set_author(name="Synapse", url="https://github.com/KingRegera", icon_url="https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4")
-  embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
-  embed.add_field(name="Stock Price", value="X Stock (Symbol)", inline=False)
-  embed.add_field(name="Graph", value="X Graph (Symbol)", inline=False)
-  embed.add_field(name="Custom Graph", value="X CGraph (days) (Symbol)", inline=False)
-  embed.add_field(name="Stock Data", value="X Data (Symbol)", inline=False)
-  embed.add_field(name="Stock Return", value="X Return (Symbol)", inline=False)
-  embed.add_field(name="Prediction", value="X Predict (Symbol)", inline=False)
-  embed.add_field(name="Analysis", value="X Analysis (Symbol)", inline=False)
-  embed.add_field(name="Weather", value="X Weather (City)", inline=False)
-  embed.add_field(name="Logo", value="X Logo", inline=False)
-  embed.add_field(name="About", value="X About", inline=False)
-  embed.set_footer(text="Synapse https://github.com/KingRegera/Synapse")
+async def Host(ctx):  
+  done = time.time()
+  elapsed = done - start
+  embed = discord.Embed(title="ACTIVE", description= "Specs",color=0x5C5D7F)
+  ping = round(bot.latency * 1000)
+  #embed.set_thumbnail(url="https://i.imgur.com/c6nh2sN.png")
+  embed.add_field(name="Machine",
+                    value=str(platform.machine()), inline=False)
+  embed.add_field(name="Version",
+                    value=str(platform.version()), inline=False)
+  embed.add_field(name="Platform",
+                    value=str(platform.platform()), inline=False)
+  embed.add_field(name="System",
+                    value=str(platform.system()), inline=False)
+  embed.add_field(name="Processor",
+                    value=str(platform.processor()), inline=False)
+  embed.add_field(name="Ping",
+                    value=str(ping), inline=False)
+  embed.add_field(name="Uptime",
+                    value=str(round(elapsed,2)), inline=False)     
+  try:
+    doc_ref = db.collection(u'ServerData').document(u'Settings')
+    if doc_ref.get().exists:
+      docs = doc_ref.get({u'Server'})
+      serversetting = u'{}'.format(docs.to_dict()['Server'])
+      embed.add_field(name="Server",
+                        value=str(serversetting), inline=False)
+  except:
+    pass
+  embed.set_footer(text="Synapse Bot")
   await ctx.send(embed=embed)
-  
-keep_alive()
-bot.run('')
+
+
+extensions = [
+	'cogs.cog_example'  # Same name as it would be if you were importing it
+]
+
+if __name__ == '__main__':  # Ensures this is the file being ran
+	for extension in extensions:
+		bot.load_extension(extension)  # Loades every extension.
+
+keep_alive()  # Starts a webserver to be pinged.
+bot.run(os.getenv("BotSecret"))  # Starts the bot
