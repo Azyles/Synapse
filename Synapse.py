@@ -7,6 +7,8 @@ import random
 import platform
 from datetime import datetime
 
+import logzero
+from logzero import logger
 import time
 #SynapseInvestor
 import firebase_admin
@@ -831,7 +833,7 @@ async def Weather(ctx, *, City):
             "Synapse Weather gets information with the help of openweathermap.org",
             color=0x5C5D7F)
         embed.set_author(
-            name='Synapse', url="https://synapsebot.netlify.app/Synapse")
+            name='Synapse', url="https://synapsebot.netlify.app")
         embed.set_thumbnail(url="https://i.imgur.com/Q66BhxI.png")
 
         embed.add_field(
@@ -888,7 +890,7 @@ async def help(ctx):
         color=0x5C5D7F)
     embed.set_author(
         name="Synapse",
-        url="https://synapsebot.netlify.app/Synapse/blob/master/README.md",
+        url="https://synapsebot.netlify.app",
         icon_url=
         "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
     )
@@ -915,11 +917,14 @@ async def help(ctx):
     embed.set_footer(text="Synapse Bot")
     await ctx.send(embed=embed)
 
-
 @bot.event
 async def on_command_error(ctx, error):
   if isinstance(error, commands.errors.CommandError):
-    print(error)
+    await ctx.send(f'```{error}```')
+  logzero.logfile("rotating-logfile.log", maxBytes=1e6, backupCount=3)
+  # Log messages
+  logger.error(f'{ctx.author.id}: {error}')
+  print(f'{ctx.author.id}: {error}')
 
 @bot.command()
 async def Host(ctx):  
