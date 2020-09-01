@@ -110,14 +110,12 @@ Coming Soon
 - Improved Embeds
 - New Fun Commands
 - Error Messages
-- Logs
 
 ##### Synapse Vision Beta
 - Color Themes
 - Format Prediction Output
 - Prediction Graphs
 - Error Messages
-- Logs
 
 
 ## Known Bugs
