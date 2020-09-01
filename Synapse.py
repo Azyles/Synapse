@@ -114,7 +114,7 @@ async def CGraph(ctx, stocksymbol, range: int):
 @bot.command()
 async def AdvancedData(ctx, stocksymbol: str):
     r = requests.get('https://finnhub.io/api/v1/stock/metric?symbol=' +
-                     stocksymbol + '&metric=all&token=bre3nkfrh5rckh454te0')
+                     stocksymbol.upper() + '&metric=all&token=bre3nkfrh5rckh454te0')
     e = r.json()
     j = e['metric']
     if "error" in e:
@@ -326,7 +326,7 @@ async def AdvancedData(ctx, stocksymbol: str):
 @bot.command()
 async def AnylastData(ctx, stocksymbol: str):
     r = requests.get('https://finnhub.io/api/v1/stock/recommendation?symbol=' +
-                     stocksymbol + '&token=bre3nkfrh5rckh454te0')
+                     stocksymbol.upper() + '&token=bre3nkfrh5rckh454te0')
     e = r.json()
     j = e[0]
     if "[]" in e:
@@ -354,7 +354,7 @@ async def AnylastData(ctx, stocksymbol: str):
 
 @bot.command()
 async def Analysis(ctx, stocksymbol: str):
-    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + stocksymbol +
+    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + stocksymbol.upper() +
                      '&token=bre3nkfrh5rckh454te0')
     j = r.json()
     if "error" in j:
@@ -379,7 +379,7 @@ async def Analysis(ctx, stocksymbol: str):
 
 @bot.command()
 async def Stock(ctx, stocksymbol: str):
-    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + stocksymbol +
+    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + stocksymbol.upper() +
                      '&token=bre3nkfrh5rckh454te0')
     j = r.json()
     if "error" in j:
@@ -405,7 +405,7 @@ async def Stock(ctx, stocksymbol: str):
 @bot.command()
 async def Company(ctx, stocksymbol: str):
     r = requests.get('https://finnhub.io/api/v1/stock/profile2?symbol=' +
-                     stocksymbol + '&token=bre3nkfrh5rckh454te0')
+                     stocksymbol.upper() + '&token=bre3nkfrh5rckh454te0')
     j = r.json()
     if "{}" in j:
       await ctx.send('Ticker does not exist')
@@ -433,7 +433,7 @@ async def Company(ctx, stocksymbol: str):
 async def Crypto(ctx, stocksymbol: str):
     r = requests.get(
         'https://www.alphavantage.co/query?function=CRYPTO_RATING&symbol=' +
-        stocksymbol + '&apikey=QWOU4B1BS6VHRKOF')
+        stocksymbol.upper() + '&apikey=QWOU4B1BS6VHRKOF')
     f = r.json()
     if "Error Message" in f:
       await ctx.send(f['Error Message'])
@@ -650,7 +650,7 @@ async def Sell(ctx, stocksymbol, amount: int):
         stockown = doc_refren.get()
         if stockown.exists:
             r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
-                             stocksymbol + '&token=bre3nkfrh5rckh454te0')
+                             stocksymbol.upper() + '&token=bre3nkfrh5rckh454te0')
             j = r.json()
             if "error" in j:
               await ctx.send('Ticker does not exist')
@@ -717,7 +717,7 @@ async def Buy(ctx, stocksymbol, amount: int):
             share_check = check_share.get()
             if share_check.exists:
                 r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
-                                 stocksymbol + '&token=bre3nkfrh5rckh454te0')
+                                 stocksymbol.upper() + '&token=bre3nkfrh5rckh454te0')
                 j = r.json()
                 if "error" in j:
                   await ctx.send('Ticker does not exist')
@@ -759,7 +759,7 @@ async def Buy(ctx, stocksymbol, amount: int):
                 await ctx.send(embed=embed)
             else:
                 r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
-                                 stocksymbol + '&token=bre3nkfrh5rckh454te0')
+                                 stocksymbol.upper() + '&token=bre3nkfrh5rckh454te0')
                 j = r.json()
                 if "error" in j:
                   await ctx.send('Ticker does not exist')
