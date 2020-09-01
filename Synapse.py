@@ -76,10 +76,15 @@ async def Ping(ctx):
     print(ping)
     await ctx.send(f"The ping of this bot is {ping} ms")
 
+
 @bot.command()
 async def Graph(ctx, stocksymbol, range = 0):
+  q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+  f = q.json()
+  fe = f["bestMatches"][0]
+  x = fe["1. symbol"]
   if range == 0:
-    df = web.DataReader(stocksymbol, 'yahoo')
+    df = web.DataReader(x, 'yahoo')
     df['Adj Close'].plot(
         color=random.choice(graphcolor), linewidth=1, figsize=(10, 7))
     plt.title("Adjusted Close Price of %s" % stocksymbol, fontsize=16)
@@ -94,7 +99,7 @@ async def Graph(ctx, stocksymbol, range = 0):
     os.remove("Images/Stock.png")
   else:
     week = datetime.now() - timedelta(days=int(range))
-    df = web.DataReader(stocksymbol, 'yahoo', week, dt.datetime.now())
+    df = web.DataReader(x, 'yahoo', week, dt.datetime.now())
     df['Adj Close'].plot(
         color=random.choice(graphcolor), linewidth=1, figsize=(10, 7))
     plt.title("Adjusted Close Price of %s" % stocksymbol, fontsize=16)
@@ -108,12 +113,44 @@ async def Graph(ctx, stocksymbol, range = 0):
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
 
-
+@bot.command()
+async def Target(ctx, stocksymbol: str):
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
+    r = requests.get('https://finnhub.io/api/v1/stock/price-target?symbol=' +
+                     x + '&token=bre3nkfrh5rckh454te0')
+    j = r.json()
+    if "[]" in j:
+      await ctx.send('Ticker does not exist')
+    embed = discord.Embed(
+        title=j["symbol"],
+        description="Price Target",
+        color=0x5C5D7F)
+    embed.set_author(
+        name="Synapse",
+        url="https://synapsebot.netlify.app",
+        icon_url=
+        "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
+    )
+    embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
+    embed.add_field(name="Last Updated", value=j["lastUpdated"], inline=False)
+    embed.add_field(name="Target High", value=j["targetHigh"], inline=False)
+    embed.add_field(name="Target Low", value=j["targetLow"], inline=False)
+    embed.add_field(name="Target Mean", value=j["targetMean"], inline=False)
+    embed.add_field(name="Target Median", value=j["targetMedian"], inline=False)
+    embed.set_footer(text="Synapse Bot")
+    await ctx.send(embed=embed)
 
 @bot.command()
 async def AdvancedData(ctx, stocksymbol: str):
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
     r = requests.get('https://finnhub.io/api/v1/stock/metric?symbol=' +
-                     stocksymbol.upper() + '&metric=all&token=bre3nkfrh5rckh454te0')
+                     x + '&metric=all&token=bre3nkfrh5rckh454te0')
     e = r.json()
     j = e['metric']
     if "error" in e:
@@ -353,7 +390,11 @@ async def AnylastData(ctx, stocksymbol: str):
 
 @bot.command()
 async def Analysis(ctx, stocksymbol: str):
-    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + stocksymbol.upper() +
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
+    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + x +
                      '&token=bre3nkfrh5rckh454te0')
     j = r.json()
     if "error" in j:
@@ -378,7 +419,11 @@ async def Analysis(ctx, stocksymbol: str):
 
 @bot.command()
 async def Stock(ctx, stocksymbol: str):
-    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + stocksymbol.upper() +
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
+    r = requests.get('https://finnhub.io/api/v1/quote?symbol=' + x +
                      '&token=bre3nkfrh5rckh454te0')
     j = r.json()
     if "error" in j:
@@ -403,8 +448,12 @@ async def Stock(ctx, stocksymbol: str):
 
 @bot.command()
 async def Company(ctx, stocksymbol: str):
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
     r = requests.get('https://finnhub.io/api/v1/stock/profile2?symbol=' +
-                     stocksymbol.upper() + '&token=bre3nkfrh5rckh454te0')
+                     x + '&token=bre3nkfrh5rckh454te0')
     j = r.json()
     if "{}" in j:
       await ctx.send('Ticker does not exist')
@@ -430,9 +479,13 @@ async def Company(ctx, stocksymbol: str):
 
 @bot.command()
 async def Crypto(ctx, stocksymbol: str):
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
     r = requests.get(
         'https://www.alphavantage.co/query?function=CRYPTO_RATING&symbol=' +
-        stocksymbol.upper() + '&apikey=QWOU4B1BS6VHRKOF')
+        x + '&apikey=QWOU4B1BS6VHRKOF')
     f = r.json()
     if "Error Message" in f:
       await ctx.send(f['Error Message'])
@@ -495,7 +548,11 @@ async def RiskReturn(
         ctx,
         stocksymbol: str,
 ):
-    dfcomp = web.DataReader(stocksymbol, 'yahoo')
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
+    dfcomp = web.DataReader(x, 'yahoo')
     retscomp = dfcomp.pct_change()
     plt.scatter(retscomp.mean(), retscomp.std())
     plt.xlabel('Expected returns')
@@ -514,39 +571,14 @@ async def RiskReturn(
     file = discord.File("Images/Stock.png", filename="Images/Stock.png")
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
-
-
-@bot.command()
-async def XRiskReturn(
-        ctx,
-        stocksymbol: str,
-        stocksymbol2: str,
-        stocksymbol3: str,
-):
-    dfcomp = web.DataReader([stocksymbol, stocksymbol2, stocksymbol3], 'yahoo')
-    retscomp = dfcomp.pct_change()
-    plt.scatter(retscomp.mean(), retscomp.std())
-    plt.xlabel('Expected returns')
-    plt.ylabel('Risk')
-    for label, x, y in zip(retscomp.columns, retscomp.mean(), retscomp.std()):
-        plt.annotate(
-            label,
-            xy=(x, y),
-            xytext=(20, -20),
-            textcoords='offset points',
-            ha='right',
-            va='bottom',
-            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
-            arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
-    plt.savefig("Images/Stock.png")
-    file = discord.File("Images/Stock.png", filename="Images/Stock.png")
-    await ctx.send(file=file)
-    os.remove("Images/Stock.png")
-
 
 @bot.command()
 async def Return(ctx, stocksymbol: str):
-    df = web.DataReader(stocksymbol, 'yahoo')
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
+    df = web.DataReader(x, 'yahoo')
     df_daily_returns = df['Adj Close'].pct_change()
     df_monthly_returns = df['Adj Close'].resample('M').ffill().pct_change()
     fig = plt.figure()
@@ -587,16 +619,20 @@ async def Return(ctx, stocksymbol: str):
 
 @bot.command()
 async def Data(ctx, stocksymbol, days=0):
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
     if days == 0:
         yesterday = datetime.now() - timedelta(days=7)
-        df = web.DataReader(stocksymbol, 'yahoo', yesterday, dt.datetime.now())
+        df = web.DataReader(x, 'yahoo', yesterday, dt.datetime.now())
         style.use('ggplot')
         df.reset_index(inplace=True)
         df.set_index("Date", inplace=True)
         await ctx.send(df.head())
     else:
         yesterday = datetime.now() - timedelta(days=days)
-        df = web.DataReader(stocksymbol, 'yahoo', yesterday, dt.datetime.now())
+        df = web.DataReader(x, 'yahoo', yesterday, dt.datetime.now())
         style.use('ggplot')
         df.reset_index(inplace=True)
         df.set_index("Date", inplace=True)
@@ -639,6 +675,10 @@ async def Portfolio(ctx):
 
 @bot.command()
 async def Sell(ctx, stocksymbol, amount: int):
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
     doc_ref = db.collection(str(ctx.author.id)).document(u'UserData')
     doc = doc_ref.get()
     docs = doc_ref.get({u'Cash'})
@@ -649,7 +689,7 @@ async def Sell(ctx, stocksymbol, amount: int):
         stockown = doc_refren.get()
         if stockown.exists:
             r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
-                             stocksymbol.upper() + '&token=bre3nkfrh5rckh454te0')
+                             x + '&token=bre3nkfrh5rckh454te0')
             j = r.json()
             if "error" in j:
               await ctx.send('Ticker does not exist')
@@ -703,6 +743,10 @@ async def Sell(ctx, stocksymbol, amount: int):
 
 @bot.command()
 async def Buy(ctx, stocksymbol, amount: int):
+    q = requests.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+stocksymbol+'&apikey=QWOU4B1BS6VHRKOF')
+    f = q.json()
+    fe = f["bestMatches"][0]
+    x = fe["1. symbol"]
     doc_ref = db.collection(str(ctx.author.id)).document(u'UserData')
     doc = doc_ref.get()
     if doc.exists:
@@ -716,7 +760,7 @@ async def Buy(ctx, stocksymbol, amount: int):
             share_check = check_share.get()
             if share_check.exists:
                 r = requests.get('https://finnhub.io/api/v1/quote?symbol=' +
-                                 stocksymbol.upper() + '&token=bre3nkfrh5rckh454te0')
+                                 x + '&token=bre3nkfrh5rckh454te0')
                 j = r.json()
                 if "error" in j:
                   await ctx.send('Ticker does not exist')
@@ -894,22 +938,21 @@ async def help(ctx):
         "https://avatars0.githubusercontent.com/u/56901151?s=460&u=b73775bdb91fcc2c59cb28b066404f3b6b348262&v=4"
     )
     embed.set_thumbnail(url="https://i.imgur.com/WkqngoQ.png")
-    
-    embed.add_field(name="Example Tickers", value="`TSLA` `AAPL` `RACE` `DAL`", inline=False)
-    embed.add_field(name="Stock Price", value="`X Stock (Ticker)`", inline=False)
-    embed.add_field(name="Advanced Data", value="`X AdvancedData (Ticker)`", inline=False)
-    embed.add_field(name="Advanced Data", value="`X AdvancedData (Ticker)`", inline=False)
-    embed.add_field(name="Graph", value="`X Graph (Ticker)`", inline=False)
-    embed.add_field(name="Custom Graph", value="`X Graph (Ticker) (days) `", inline=False)
-    embed.add_field(name="Company Data", value="`X Company (Ticker`)", inline=False)
-    embed.add_field(name="Crypto Info", value="`X Crypto (Ticker)`", inline=False)
-    embed.add_field(name="Company Data", value="`X Company (Ticker)`", inline=False)
-    embed.add_field(name="Return", value="`X Return (Ticker)`", inline=False)
-    embed.add_field(name="Unformatted Data", value="`X Data (Ticker)`", inline=False)
-    embed.add_field(name="Weather", value="`X Company (Ticker)`", inline=False)
+    embed.add_field(name="Example", value="`X Stock Ferrari`", inline=False)
+    embed.add_field(name="Stock Price", value="`X Stock (Stock)`", inline=False)
+    embed.add_field(name="Advanced Data", value="`X AdvancedData (Stock)`", inline=False)
+    embed.add_field(name="Advanced Data", value="`X AdvancedData (Stock)`", inline=False)
+    embed.add_field(name="Graph", value="`X Graph (Stock)`", inline=False)
+    embed.add_field(name="Custom Graph", value="`X CGraph (days) (Stock)`", inline=False)
+    embed.add_field(name="Company Data", value="`X Company (Stock`)", inline=False)
+    embed.add_field(name="Crypto Info", value="`X Crypto (Stock)`", inline=False)
+    embed.add_field(name="Company Data", value="`X Company (Stock)`", inline=False)
+    embed.add_field(name="Return", value="`X Return (Stock)`", inline=False)
+    embed.add_field(name="Unformatted Data", value="`X Data (Stock)`", inline=False)
+    embed.add_field(name="Weather", value="`X Company (Stock)`", inline=False)
     embed.add_field(name="Start Game (10k)", value="`X Start`", inline=False)
-    embed.add_field(name="Buy Stock", value="`X Buy (Ticker) (Amount)`", inline=False)
-    embed.add_field(name="Sell Stock", value="`X Sell (Ticker) (Amount)`", inline=False)
+    embed.add_field(name="Buy Stock", value="`X Buy (Stock) (Amount)`", inline=False)
+    embed.add_field(name="Sell Stock", value="`X Sell (Stock) (Amount)`", inline=False)
     embed.add_field(name="Portfolio", value="`X Portfolio`", inline=False)
     embed.add_field(name="Host Info", value="`X Host`", inline=False)
     
@@ -918,12 +961,18 @@ async def help(ctx):
 
 @bot.event
 async def on_command_error(ctx, error):
-  if isinstance(error, commands.errors.CommandError):
-    await ctx.send(f'```{error}```')
-  logzero.logfile("rotating-logfile.log", maxBytes=1e6, backupCount=3)
-  # Log messages
-  logger.error(f'{ctx.author.id}: {error}')
-  print(f'{ctx.author.id}: {error}')
+  print(error)
+  if str(error) == "Command raised an exception: IndexError: list index out of range":
+    await ctx.send(f'`Stock Not Found`')
+  elif str(error) == "Command raised an exception: KeyError: 'c'":
+    await ctx.send(f'`Stock Not Found`')
+  else:
+    if isinstance(error, commands.errors.CommandError):
+      await ctx.send(f'```{error}```')
+    logzero.logfile("rotating-logfile.log", maxBytes=1e6, backupCount=3)
+    # Log messages
+    logger.error(f'{ctx.author.id}: {error}')
+    print(f'{ctx.author.id}: {error}')
 
 @bot.command()
 async def Host(ctx):  
