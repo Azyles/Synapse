@@ -77,7 +77,8 @@ async def Ping(ctx):
     await ctx.send(f"The ping of this bot is {ping} ms")
 
 @bot.command()
-async def Graph(ctx, *stocksymbol):
+async def Graph(ctx, stocksymbol, range = 0):
+  if range == 0:
     df = web.DataReader(stocksymbol, 'yahoo')
     df['Adj Close'].plot(
         color=random.choice(graphcolor), linewidth=1, figsize=(10, 7))
@@ -91,11 +92,8 @@ async def Graph(ctx, *stocksymbol):
     df.set_index("Date", inplace=True)
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
-
-
-@bot.command()
-async def CGraph(ctx, stocksymbol, range: int):
-    week = datetime.now() - timedelta(days=range)
+  else:
+    week = datetime.now() - timedelta(days=int(range))
     df = web.DataReader(stocksymbol, 'yahoo', week, dt.datetime.now())
     df['Adj Close'].plot(
         color=random.choice(graphcolor), linewidth=1, figsize=(10, 7))
@@ -109,6 +107,7 @@ async def CGraph(ctx, stocksymbol, range: int):
     df.set_index("Date", inplace=True)
     await ctx.send(file=file)
     os.remove("Images/Stock.png")
+
 
 
 @bot.command()
@@ -901,7 +900,7 @@ async def help(ctx):
     embed.add_field(name="Advanced Data", value="`X AdvancedData (Ticker)`", inline=False)
     embed.add_field(name="Advanced Data", value="`X AdvancedData (Ticker)`", inline=False)
     embed.add_field(name="Graph", value="`X Graph (Ticker)`", inline=False)
-    embed.add_field(name="Custom Graph", value="`X CGraph (days) (Ticker)`", inline=False)
+    embed.add_field(name="Custom Graph", value="`X Graph (Ticker) (days) `", inline=False)
     embed.add_field(name="Company Data", value="`X Company (Ticker`)", inline=False)
     embed.add_field(name="Crypto Info", value="`X Crypto (Ticker)`", inline=False)
     embed.add_field(name="Company Data", value="`X Company (Ticker)`", inline=False)
