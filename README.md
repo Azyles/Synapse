@@ -2,9 +2,6 @@
 
 Synapse is a discord bot designed for all the business-minded users of discord. It provides an immense amount of information including, graphing and stock predictions. Synapse uses many different secure APIs to gather real-time information. To add on to the already diverse list of features Synapse also offers a simulation game in which you can build your own virtual portfolio risk-free! 
 
-[<img src="https://img.shields.io/uptimerobot/status/m785757371-d4bd01973864ec95bc2a4f24?color=Orange&label=SYNAPSE%20STATUS&style=for-the-badge">](
-https://img.shields.io/uptimerobot/status/m785757371-d4bd01973864ec95bc2a4f24?color=Orange&label=SYNAPSE%20STATUS&style=for-the-badge)
-
 [<img src="https://img.shields.io/uptimerobot/ratio/m785757371-d4bd01973864ec95bc2a4f24?color=Orange&label=SYNAPSE%20UPTIME&style=for-the-badge">](
 https://img.shields.io/uptimerobot/ratio/m785757371-d4bd01973864ec95bc2a4f24?color=Orange&label=SYNAPSE%20UPTIME&style=for-the-badge)
 
